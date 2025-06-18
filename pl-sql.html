@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Stored Procedures Visual Guide</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .function-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: rgb(0, 0, 0);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .function-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .function-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .function-purpose {
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .function-example {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .interactive-example {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .example-input {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .example-input input,
+      .example-input select {
+        padding: 8px 12px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .example-result {
+        background: #d4edda;
+        border: 2px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s ease;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .tips {
+        background: #e3f2fd;
+        border-left: 5px solid #2196f3;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+      }
+
+      .tips h3 {
+        color: #1976d2;
+        margin-bottom: 10px;
+      }
+
+      .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .summary-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .summary-table tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SQL Stored Procedures Visual Guide</h1>
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('overview')">🔍 Overview</div>
+        <div class="tab" onclick="showTab('basics')">⚙️ Basics</div>
+        <div class="tab" onclick="showTab('parameters')">🔐 Parameters</div>
+        <div class="tab" onclick="showTab('execution')">🚀 Execution</div>
+        <div class="tab" onclick="showTab('comparison')">🧩 Comparison</div>
+        <div class="tab" onclick="showTab('usecases')">✅ Use Cases</div>
+        <div class="tab" onclick="showTab('summary')">📋 Summary</div>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="overview" class="tab-content active">
+        <div class="function-card">
+          <div class="function-name">Stored Procedures in SQL</div>
+          <div class="function-purpose">
+            Reusable blocks of SQL logic stored in the database
+          </div>
+          <div class="function-example">
+            CREATE PROCEDURE ProcedureName AS BEGIN SQL Statements; END
+          </div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 Key Concepts</h3>
+          <p>
+            Stored procedures allow you to encapsulate complex SQL logic, making
+            it reusable and secure. They can accept parameters, return results,
+            and even modify data.
+          </p>
+        </div>
+      </div>
+
+      <!-- Basics Tab -->
+      <div id="basics" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          ⚙️ Stored Procedure Basics
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Simple Stored Procedure</div>
+          <div class="function-purpose">
+            Create and run a basic stored procedure
+          </div>
+          <div class="function-example">
+            -- SQL Server CREATE PROCEDURE GetCustomers AS BEGIN SELECT * FROM
+            Customers; END -- Execute: EXEC GetCustomers;
+          </div>
+        </div>
+
+        <div class="function-card">
+          <div class="function-name">MySQL Stored Procedure</div>
+          <div class="function-purpose">
+            Creating procedures in MySQL requires delimiter changes
+          </div>
+          <div class="function-example">
+            DELIMITER $$ CREATE PROCEDURE GetCustomers() BEGIN SELECT * FROM
+            Customers; END$$ DELIMITER ; -- Execute: CALL GetCustomers();
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Creating a Procedure!</h3>
+          <div class="example-input">
+            <label>Procedure Name:</label>
+            <input
+              type="text"
+              id="procedureName"
+              value="GetEmployees"
+              placeholder="Enter procedure name"
+            />
+            <label>SQL Statement:</label>
+            <input
+              type="text"
+              id="procedureSql"
+              value="SELECT * FROM Employees"
+              placeholder="Enter SQL statement"
+            />
+            <button onclick="createProcedure()">Create Procedure</button>
+          </div>
+          <div class="example-result" id="procedureResult">
+            <pre style="background: #e0e0e0; padding: 15px; border-radius: 5px">
+                    Procedure created successfully!
+                    Use EXEC GetEmployees; (SQL Server) or CALL GetEmployees(); (MySQL) to run it.
+                    </pre
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Parameters Tab -->
+      <div id="parameters" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🔐 Stored Procedures with Parameters
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Parameterized Procedure</div>
+          <div class="function-purpose">
+            Add flexibility with input parameters
+          </div>
+          <div class="function-example">
+            -- SQL Server CREATE PROCEDURE GetCustomerByID @CustID INT AS BEGIN
+            SELECT * FROM Customers WHERE CustomerID = @CustID; END -- Execute:
+            EXEC GetCustomerByID @CustID = 5;
+          </div>
+        </div>
+
+        <div class="function-card">
+          <div class="function-name">MySQL Parameters</div>
+          <div class="function-purpose">
+            Parameters in MySQL don't use @ symbol
+          </div>
+          <div class="function-example">
+            DELIMITER $$ CREATE PROCEDURE GetCustomerByID (CustID INT) BEGIN
+            SELECT * FROM Customers WHERE CustomerID = CustID; END$$ DELIMITER ;
+            -- Execute: CALL GetCustomerByID(5);
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Parameterized Procedure!</h3>
+          <div class="example-input">
+            <label>Procedure Name:</label>
+            <input
+              type="text"
+              id="paramProcedureName"
+              value="GetStudentByID"
+              placeholder="Enter procedure name"
+            />
+            <label>Parameter Name:</label>
+            <input
+              type="text"
+              id="paramName"
+              value="StudentID"
+              placeholder="Enter parameter name"
+            />
+            <label>Parameter Type:</label>
+            <select id="paramType">
+              <option value="INT">INT</option>
+              <option value="VARCHAR">VARCHAR</option>
+              <option value="FLOAT">FLOAT</option>
+            </select>
+            <label>SQL Statement:</label>
+            <input
+              type="text"
+              id="paramSql"
+              value="SELECT * FROM Students WHERE StudentID = @StudentID"
+              placeholder="Enter SQL statement"
+            />
+            <button onclick="createParamProcedure()">Create Procedure</button>
+          </div>
+          <div class="example-result" id="paramResult">
+            <pre style="background: #e0e0e0; padding: 15px; border-radius: 5px">
+                    Procedure created successfully!
+                    Use EXEC GetStudentByID @StudentID = 101; (SQL Server)
+                    or CALL GetStudentByID(101); (MySQL) to run it.
+                    </pre
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Execution Tab -->
+      <div id="execution" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🚀 Executing Stored Procedures
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Executing Procedures</div>
+          <div class="function-purpose">
+            Run stored procedures with or without parameters
+          </div>
+          <div class="function-example">
+            -- SQL Server EXEC ProcedureName; EXEC ProcedureName @Param = Value;
+            -- MySQL CALL ProcedureName(); CALL ProcedureName(Value);
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Executing a Procedure!</h3>
+          <div class="example-input">
+            <label>Procedure Name:</label>
+            <input
+              type="text"
+              id="execProcedure"
+              value="GetEmployees"
+              placeholder="Enter procedure name"
+            />
+            <label>Parameters (comma-separated):</label>
+            <input
+              type="text"
+              id="execParams"
+              value=""
+              placeholder="Enter parameters if needed"
+            />
+            <button onclick="executeProcedure()">Execute Procedure</button>
+          </div>
+          <div class="example-result" id="execResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>EmployeeID</th>
+                <th>Name</th>
+                <th>Title</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>John Doe</td>
+                <td>Manager</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Jane Smith</td>
+                <td>Developer</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Tab -->
+      <div id="comparison" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🧩 Stored Procedures vs Functions
+        </h2>
+
+        <table class="summary-table">
+          <tr>
+            <th>Feature</th>
+            <th>Stored Procedure</th>
+            <th>Function</th>
+          </tr>
+          <tr>
+            <td>Return type</td>
+            <td>0 or more values (via output or SELECT)</td>
+            <td>Always returns 1 value</td>
+          </tr>
+          <tr>
+            <td>Used in SELECT statements</td>
+            <td>❌ No</td>
+            <td>✅ Yes</td>
+          </tr>
+          <tr>
+            <td>Called by</td>
+            <td>EXEC or CALL</td>
+            <td>Inside other SQL (SELECT, etc.)</td>
+          </tr>
+          <tr>
+            <td>Best for</td>
+            <td>Complex logic, multiple steps</td>
+            <td>Lightweight, reusable expressions</td>
+          </tr>
+        </table>
+
+        <div class="tips">
+          <h3>💡 When to Use Each</h3>
+          <p>
+            Use stored procedures for complex operations, transactions, or when
+            you need to return multiple result sets. Use functions for
+            calculations or transformations that produce a single value and can
+            be used in expressions.
+          </p>
+        </div>
+      </div>
+
+      <!-- Use Cases Tab -->
+      <div id="usecases" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          ✅ Real-Life Use Cases
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Security Enforcement</div>
+          <div class="function-purpose">Restrict direct table access</div>
+          <div class="function-example">
+            CREATE PROCEDURE GetSecureData @UserID INT AS BEGIN SELECT Data FROM
+            SecureTable WHERE UserID = @UserID AND AccessGranted = 1; END
+          </div>
+        </div>
+
+        <div class="function-card">
+          <div class="function-name">Report Generation</div>
+          <div class="function-purpose">Bundle complex reporting logic</div>
+          <div class="function-example">
+            CREATE PROCEDURE GenerateSalesReport @Month INT, @Year INT AS BEGIN
+            SELECT Products.ProductName, SUM(Sales.Quantity) AS TotalSold FROM
+            Sales JOIN Products ON Sales.ProductID = Products.ProductID WHERE
+            MONTH(SalesDate) = @Month AND YEAR(SalesDate) = @Year GROUP BY
+            Products.ProductName; END
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Report Generation Procedure!</h3>
+          <div class="example-input">
+            <label>Month:</label>
+            <input type="number" id="reportMonth" value="9" min="1" max="12" />
+            <label>Year:</label>
+            <input
+              type="number"
+              id="reportYear"
+              value="2023"
+              min="2000"
+              max="2099"
+            />
+            <button onclick="generateReport()">Generate Report</button>
+          </div>
+          <div class="example-result" id="reportResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Product</th>
+                <th>Total Sold</th>
+              </tr>
+              <tr>
+                <td>Widget A</td>
+                <td>45</td>
+              </tr>
+              <tr>
+                <td>Widget B</td>
+                <td>32</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Tab -->
+      <div id="summary" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📋 Summary
+        </h2>
+        <table class="summary-table">
+          <tr>
+            <th>Task</th>
+            <th>SQL Server Command</th>
+            <th>MySQL Command</th>
+          </tr>
+          <tr>
+            <td>Create procedure</td>
+            <td>CREATE PROCEDURE</td>
+            <td>CREATE PROCEDURE with DELIMITER</td>
+          </tr>
+          <tr>
+            <td>Call a procedure</td>
+            <td>EXEC ProcedureName</td>
+            <td>CALL ProcedureName()</td>
+          </tr>
+          <tr>
+            <td>With parameters</td>
+            <td>@ParamName</td>
+            <td>ParamName without @</td>
+          </tr>
+          <tr>
+            <td>Modify procedure</td>
+            <td>ALTER PROCEDURE</td>
+            <td>DROP then CREATE</td>
+          </tr>
+          <tr>
+            <td>Delete procedure</td>
+            <td>DROP PROCEDURE ProcedureName</td>
+            <td>DROP PROCEDURE ProcedureName</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        // Hide all tab contents
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => (content.style.display = "none"));
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show selected tab content
+        document.getElementById(tabName).style.display = "block";
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+
+      function createProcedure() {
+        const name = document.getElementById("procedureName").value;
+        const sql = document.getElementById("procedureSql").value;
+        const result = document.getElementById("procedureResult");
+
+        result.innerHTML = `
+                <pre style="background: #e0e0e0; padding: 15px; border-radius: 5px;">
+                Procedure "${name}" created successfully!
+                Use EXEC ${name}; (SQL Server) or CALL ${name}; (MySQL) to run it.
+                </pre>
+            `;
+      }
+
+      function createParamProcedure() {
+        const name = document.getElementById("paramProcedureName").value;
+        const param = document.getElementById("paramName").value;
+        const type = document.getElementById("paramType").value;
+        const sql = document.getElementById("paramSql").value;
+        const result = document.getElementById("paramResult");
+
+        result.innerHTML = `
+                <pre style="background: #e0e0e0; padding: 15px; border-radius: 5px;">
+                Procedure "${name}" created successfully!
+                Use EXEC ${name} @${param} = Value; (SQL Server)
+                or CALL ${name}(Value); (MySQL) to run it.
+                </pre>
+            `;
+      }
+
+      function executeProcedure() {
+        const name = document.getElementById("execProcedure").value;
+        const params = document.getElementById("execParams").value;
+        const result = document.getElementById("execResult");
+
+        // Simulate procedure execution
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>EmployeeID</th>
+                        <th>Name</th>
+                        <th>Title</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>John Doe</td>
+                        <td>Manager</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jane Smith</td>
+                        <td>Developer</td>
+                    </tr>
+                </table>
+            `;
+      }
+
+      function generateReport() {
+        const month = document.getElementById("reportMonth").value;
+        const year = document.getElementById("reportYear").value;
+        const result = document.getElementById("reportResult");
+
+        // Simulate report generation
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Product</th>
+                        <th>Total Sold</th>
+                    </tr>
+                    <tr>
+                        <td>Widget A</td>
+                        <td>45</td>
+                    </tr>
+                    <tr>
+                        <td>Widget B</td>
+                        <td>32</td>
+                    </tr>
+                </table>
+            `;
+      }
+
+      // Initialize interactive examples
+      executeProcedure();
+      generateReport();
+    </script>
+  </body>
+</html>

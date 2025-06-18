@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Conditional Logic Visual Guide</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+      }
+
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: rgba(44, 62, 80, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .function-card {
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: #2c3e50;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s ease;
+        margin-bottom: 20px;
+      }
+
+      .function-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .function-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+
+      .function-purpose {
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .function-example {
+        background: rgba(44, 62, 80, 0.05);
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        color: #2c3e50;
+      }
+
+      .interactive-example {
+        background: #f8f9fa;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .example-input {
+        display: flex;
+        gap: 15px;
+        margin: 15px 0;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .example-input input,
+      .example-input select {
+        padding: 10px 15px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+        min-width: 200px;
+      }
+
+      .example-result {
+        background: white;
+        border: 2px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s ease;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .tips {
+        background: #e3f2fd;
+        border-left: 5px solid #2196f3;
+        padding: 15px 20px;
+        margin: 25px 0;
+        border-radius: 0 10px 10px 0;
+      }
+
+      .tips h3 {
+        color: #1976d2;
+        margin-bottom: 10px;
+      }
+
+      .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 25px 0;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+
+      .summary-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .summary-table tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SQL Conditional Logic Visual Guide</h1>
+    </div>
+  </body>
+</html>
+<div class="tabs">
+    <div class="tab active" onclick="showTab('overview')">BOOLEANS</div>
+    <div class="tab" onclick="showTab('simple')">SIMPLE CASE</div>
+    <div class="tab" onclick="showTab('searched')">SEARCHED CASE</div>
+    <div class="tab" onclick="showTab('advanced')">ADVANCED CASE</div>
+    <div class="tab" onclick="showTab('summary')">SUMMARY</div>
+</div>
+
+<!-- Overview Tab -->
+<div id="overview" class="tab-content active">
+    <div class="function-card">
+        <div class="function-name">Conditional Logic with CASE</div>
+        <div class="function-purpose">Use CASE to create dynamic output based on conditions</div>
+        <div class="function-example">
+            CASE
+              WHEN condition THEN result
+              [ELSE alternative_result]
+            END
+        </div>
+    </div>
+    
+    <div class="tips">
+        <h3>BOOLEANS in CASE</h3>
+        <p>BOOLEANS help you build complex conditions inside CASE expressions. Use them to control which results get displayed based on your data's true state.</p>
+    </div>
+</div>
+
+<!-- Simple CASE Tab -->
+<div id="simple" class="tab-content">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">BOOLEANS and SIMPLE CASE</h2>
+    
+    <div class="function-card">
+        <div class="function-name">BOOLEANS Simple CASE</div>
+        <div class="function-purpose">BOOLEANS Compare one column to multiple values</div>
+        <div class="function-example">
+            CASE CategoryCode
+              WHEN 'F' THEN 'Fruit'
+              WHEN 'V' THEN 'Vegetable'
+              ELSE 'Other'
+            END AS Category
+        </div>
+    </div>
+    
+    <div class="interactive-example">
+        <h3>BOOLEANS in Action: Simple CASE</h3>
+        <div class="example-input">
+            <label>Category Code:</label>
+            <input type="text" id="categoryCode" value="F" placeholder="Enter code (F, V, S, etc.)">
+            <button onclick="applySimpleCase()">BOOLEANS Apply</button>
+        </div>
+        <div class="example-result" id="simpleCaseResult">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background: #e0e0e0;">
+                    <th>Category Code</th>
+                    <th>Category</th>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>Fruit</td>
+                </tr>
+                <tr>
+                    <td>V</td>
+                    <td>Vegetable</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>Other</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Searched CASE Tab -->
+<div id="searched" class="tab-content">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">BOOLEANS and SEARCHED CASE</h2>
+    
+    <div class="function-card">
+        <div class="function-name">BOOLEANS Searched CASE</div>
+        <div class="function-purpose">BOOLEANS More flexible conditions with operators</div>
+        <div class="function-example">
+            CASE
+              WHEN CategoryCode = 'F' THEN 'Fruit'
+              WHEN CategoryCode = 'V' THEN 'Vegetable'
+              ELSE 'Other'
+            END AS Category
+        </div>
+    </div>
+    
+    <div class="interactive-example">
+        <h3>BOOLEANS in Action: Searched CASE</h3>
+        <div class="example-input">
+            <label>Category Code:</label>
+            <input type="text" id="searchedCode" value="F" placeholder="Enter code">
+            <button onclick="applySearchedCase()">BOOLEANS Apply</button>
+        </div>
+        <div class="example-result" id="searchedCaseResult">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background: #e0e0e0;">
+                    <th>Category Code</th>
+                    <th>Category</th>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>Fruit</td>
+                </tr>
+                <tr>
+                    <td>V</td>
+                    <td>Vegetable</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>Other</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced CASE Tab -->
+<div id="advanced" class="tab-content">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">BOOLEANS and ADVANCED CASE</h2>
+    
+    <div class="function-card">
+        <div class="function-name">BOOLEANS Dynamic Sorting</div>
+        <div class="function-purpose">BOOLEANS Conditionally determine sorting columns</div>
+        <div class="function-example">
+            ORDER BY
+              Country,
+              CASE 
+                WHEN Country = 'US' THEN State
+                WHEN Country = 'CA' THEN Province
+                ELSE City
+              END
+        </div>
+    </div>
+    
+    <div class="function-card">
+        <div class="function-name">BOOLEANS Tier-Based Filtering</div>
+        <div class="function-purpose">BOOLEANS Adapt filtering criteria based on conditions</div>
+        <div class="function-example">
+            SELECT *
+            FROM Customers
+            WHERE Income >
+              CASE
+                WHEN Gender = 'M' AND Age >= 50 THEN 75000
+                WHEN Gender = 'F' AND Age >= 35 THEN 60000
+                ELSE 50000
+              END;
+        </div>
+    </div>
+    
+    <div class="interactive-example">
+        <h3>BOOLEANS in Action: Advanced CASE</h3>
+        <div class="example-input">
+            <label>Country:</label>
+            <input type="text" id="country" value="US" placeholder="Enter country (US, CA, etc.)">
+            <label>Gender:</label>
+            <input type="text" id="gender" value="M" placeholder="Enter gender (M/F)">
+            <label>Age:</label>
+            <input type="number" id="age" value="45" min="1">
+            <button onclick="applyAdvancedCase()">BOOLEANS Apply</button>
+        </div>
+        <div class="example-result" id="advancedCaseResult">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background: #e0e0e0;">
+                    <th>Country</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                    <th>Required Income</th>
+                </tr>
+                <tr>
+                    <td>US</td>
+                    <td>M</td>
+                    <td>45</td>
+                    <td>$75,000</td>
+                </tr>
+                <tr>
+                    <td>CA</td>
+                    <td>F</td>
+                    <td>36</td>
+                    <td>$60,000</td>
+                </tr>
+                <tr>
+                    <td>MX</td>
+                    <td>M</td>
+                    <td>30</td>
+                    <td>$50,000</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Tab -->
+<div id="summary" class="tab-content">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">BOOLEANS SUMMARY</h2>
+    <table class="summary-table">
+        <tr>
+            <th>BOOLEANS Use Case</th>
+            <th>BOOLEANS Where to Use CASE</th>
+            <th>BOOLEANS Example</th>
+        </tr>
+        <tr>
+            <td>BOOLEANS Translate codes</td>
+            <td>BOOLEANS SELECT clause</td>
+            <td>'F' → 'Fruit', 'V' → 'Vegetable'</td>
+        </tr>
+        <tr>
+            <td>BOOLEANS Custom sort logic</td>
+            <td>BOOLEANS ORDER BY clause</td>
+            <td>BOOLEANS Sort by state if US, by province if Canada</td>
+        </tr>
+        <tr>
+            <td>BOOLEANS Tier-based filtering</td>
+            <td>BOOLEANS WHERE clause</td>
+            <td>BOOLEANS Income filters vary by gender/age</td>
+        </tr>
+        <tr>
+            <td>BOOLEANS Aggregated logic</td>
+            <td>BOOLEANS HAVING clause</td>
+            <td>BOOLEANS Different cutoffs per grade level</td>
+        </tr>
+        <tr>
+            <td>BOOLEANS Safe math</td>
+            <td>BOOLEANS Inside calculations</td>
+            <td>BOOLEANS Avoid division by 0</td>
+        </tr>
+    </table>
+</div>
+</div>
+
+<script>
+function showTab(tabName) {
+    // Hide all tab contents
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.style.display = 'none');
+    
+    // Remove active class from all tabs
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Show selected tab content
+    document.getElementById(tabName).style.display = 'block';
+    
+    // Add active class to clicked tab
+    event.target.classList.add('active');
+}
+
+function applySimpleCase() {
+    const code = document.getElementById('categoryCode').value;
+    const result = document.getElementById('simpleCaseResult');
+    
+    // Simulate CASE logic
+    let category;
+    switch(code.toUpperCase()) {
+        case 'F':
+            category = 'Fruit';
+            break;
+        case 'V':
+            category = 'Vegetable';
+            break;
+        case 'B':
+            category = 'Beverage';
+            break;
+        default:
+            category = 'Other';
+    }
+    
+    result.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #e0e0e0;">
+                <th>Category Code</th>
+                <th>Category</th>
+            </tr>
+            <tr>
+                <td>${code}</td>
+                <td>${category}</td>
+            </tr>
+        </table>
+    `;
+}
+
+function applySearchedCase() {
+    const code = document.getElementById('searchedCode').value;
+    const result = document.getElementById('searchedCaseResult');
+    
+    // Simulate CASE logic
+    let category;
+    if (code.toUpperCase() === 'F') {
+        category = 'Fruit';
+    } else if (code.toUpperCase() === 'V') {
+        category = 'Vegetable';
+    } else if (code.toUpperCase() === 'B') {
+        category = 'Beverage';
+    } else {
+        category = 'Other';
+    }
+    
+    result.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #e0e0e0;">
+                <th>Category Code</th>
+                <th>Category</th>
+            </tr>
+            <tr>
+                <td>${code}</td>
+                <td>${category}</td>
+            </tr>
+        </table>
+    `;
+}
+
+function applyAdvancedCase() {
+    const country = document.getElementById('country').value;
+    const gender = document.getElementById('gender').value;
+    const age = parseInt(document.getElementById('age').value);
+    const result = document.getElementById('advancedCaseResult');
+    
+    // Simulate CASE logic for required income
+    let requiredIncome;
+    if (gender.toUpperCase() === 'M' && age >= 50) {
+        requiredIncome = '$75,000';
+    } else if (gender.toUpperCase() === 'F' && age >= 35) {
+        requiredIncome = '$60,000';
+    } else {
+        requiredIncome = '$50,000';
+    }
+    
+    result.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #e0e0e0;">
+                <th>Country</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Required Income</th>
+            </tr>
+            <tr>
+                <td>${country}</td>
+                <td>${gender}</td>
+                <td>${age}</td>
+                <td>${requiredIncome}</td>
+            </tr>
+        </table>
+    `;
+}
+
+// Initialize interactive examples
+applySimpleCase();
+applySearchedCase();
+applyAdvancedCase();
+</script>
+</body>
+</html>

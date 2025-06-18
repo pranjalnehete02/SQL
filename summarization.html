@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Summarizing Data Visual Guide</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .function-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: rgb(0, 0, 0);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .function-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .function-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .function-purpose {
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .function-example {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .interactive-example {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .example-input {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .example-input input,
+      .example-input select {
+        padding: 8px 12px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .example-result {
+        background: #d4edda;
+        border: 2px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s ease;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .tips {
+        background: #e3f2fd;
+        border-left: 5px solid #2196f3;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+      }
+
+      .tips h3 {
+        color: #1976d2;
+        margin-bottom: 10px;
+      }
+
+      .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .summary-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .summary-table tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SQL Summarizing Data Visual Guide</h1>
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('overview')">📊 Overview</div>
+        <div class="tab" onclick="showTab('aggregate')">
+          🧮 Aggregate Functions
+        </div>
+        <div class="tab" onclick="showTab('groupby')">📚 GROUP BY</div>
+        <div class="tab" onclick="showTab('having')">🔍 HAVING</div>
+        <div class="tab" onclick="showTab('case')">🧩 CASE in Aggregation</div>
+        <div class="tab" onclick="showTab('summary')">📋 Summary</div>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="overview" class="tab-content active">
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)"
+        >
+          <div class="function-name">Summarizing Data</div>
+          <div class="function-purpose">
+            Use SQL to analyze data and find patterns
+          </div>
+          <div class="function-example">SELECT AVG(Grade) FROM Grades;</div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 Key Concepts</h3>
+          <p>
+            Summarizing data in SQL involves using aggregate functions (SUM,
+            AVG, COUNT, etc.), grouping related data with GROUP BY, and
+            filtering aggregated results with HAVING. This transforms raw data
+            into meaningful insights.
+          </p>
+        </div>
+      </div>
+
+      <!-- Aggregate Functions Tab -->
+      <div id="aggregate" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🧮 Aggregate Functions
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">SUM()</div>
+          <div class="function-purpose">Total of a numeric column</div>
+          <div class="function-example">
+            SELECT SUM(Fee) AS TotalFees FROM Fees;
+          </div>
+        </div>
+
+        <div class="function-card">
+          <div class="function-name">AVG()</div>
+          <div class="function-purpose">Average value</div>
+          <div class="function-example">
+            SELECT AVG(Grade) AS AverageGrade FROM Grades;
+          </div>
+        </div>
+
+        <div class="function-card">
+          <div class="function-name">COUNT()</div>
+          <div class="function-purpose">Number of rows</div>
+          <div class="function-example">
+            SELECT COUNT(*) AS NumberOfStudents FROM Students;
+          </div>
+        </div>
+
+        <div class="function-card">
+          <div class="function-name">MAX() and MIN()</div>
+          <div class="function-purpose">Highest and lowest values</div>
+          <div class="function-example">
+            SELECT MAX(Score) AS HighestScore, MIN(Score) AS LowestScore FROM
+            Exams;
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Aggregate Functions!</h3>
+          <div class="example-input">
+            <label>Choose Function:</label>
+            <select id="aggregateFunction">
+              <option value="sum">SUM</option>
+              <option value="avg">AVG</option>
+              <option value="count">COUNT</option>
+              <option value="max">MAX</option>
+              <option value="min">MIN</option>
+            </select>
+            <label>Column:</label>
+            <input
+              type="text"
+              id="aggregateColumn"
+              value="Fee"
+              placeholder="Enter column name"
+            />
+            <button onclick="applyAggregateFunction()">Calculate</button>
+          </div>
+          <div class="example-result" id="aggregateResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Function</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>SUM(Fee)</td>
+                <td>60</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- GROUP BY Tab -->
+      <div id="groupby" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📚 GROUP BY
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Grouping Data</div>
+          <div class="function-purpose">Create groups of related data</div>
+          <div class="function-example">
+            SELECT GradeType, AVG(Grade) FROM Grades GROUP BY GradeType;
+          </div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 GROUP BY Tips</h3>
+          <p>
+            Always include all non-aggregated columns in the GROUP BY clause.
+            Columns used in GROUP BY must match exactly (name, type, etc.) with
+            the SELECT clause.
+          </p>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try GROUP BY!</h3>
+          <div class="example-input">
+            <label>Group By Column:</label>
+            <input
+              type="text"
+              id="groupByColumn"
+              value="GradeType"
+              placeholder="Enter column to group by"
+            />
+            <label>Aggregate Function:</label>
+            <select id="groupByAggregate">
+              <option value="sum">SUM</option>
+              <option value="avg">AVG</option>
+              <option value="count">COUNT</option>
+            </select>
+            <label>Aggregate Column:</label>
+            <input
+              type="text"
+              id="aggregateColumnGroup"
+              value="Grade"
+              placeholder="Enter column to aggregate"
+            />
+            <button onclick="applyGroupBy()">Group Data</button>
+          </div>
+          <div class="example-result" id="groupbyResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Grade Type</th>
+                <th>Average Grade</th>
+              </tr>
+              <tr>
+                <td>Homework</td>
+                <td>86</td>
+              </tr>
+              <tr>
+                <td>Quiz</td>
+                <td>77</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- HAVING Tab -->
+      <div id="having" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🔍 HAVING
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Filtering Groups</div>
+          <div class="function-purpose">Filter aggregated results</div>
+          <div class="function-example">
+            SELECT Student, AVG(Grade) FROM Grades GROUP BY Student HAVING
+            AVG(Grade) >= 70;
+          </div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 HAVING vs WHERE</h3>
+          <p>
+            WHERE filters individual rows before grouping, while HAVING filters
+            aggregated groups after grouping. Always use HAVING for conditions
+            involving aggregate functions.
+          </p>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try HAVING!</h3>
+          <div class="example-input">
+            <label>Group By Column:</label>
+            <input
+              type="text"
+              id="havingGroupBy"
+              value="Student"
+              placeholder="Enter column to group by"
+            />
+            <label>Aggregate Function:</label>
+            <select id="havingAggregate">
+              <option value="avg">AVG</option>
+              <option value="sum">SUM</option>
+            </select>
+            <label>Aggregate Column:</label>
+            <input
+              type="text"
+              id="havingAggregateColumn"
+              value="Grade"
+              placeholder="Enter column to aggregate"
+            />
+            <label>Condition:</label>
+            <input
+              type="text"
+              id="havingCondition"
+              value=">= 70"
+              placeholder="Enter condition"
+            />
+            <button onclick="applyHaving()">Filter Groups</button>
+          </div>
+          <div class="example-result" id="havingResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Student</th>
+                <th>Average Grade</th>
+              </tr>
+              <tr>
+                <td>Hailey</td>
+                <td>71.5</td>
+              </tr>
+              <tr>
+                <td>Isabella</td>
+                <td>93.5</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE in Aggregation Tab -->
+      <div id="case" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🧩 CASE in Aggregation
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">CASE with GROUP BY</div>
+          <div class="function-purpose">Create custom groups</div>
+          <div class="function-example">
+            SELECT CASE CategoryCode WHEN 'F' THEN 'Fruit' WHEN 'V' THEN
+            'Vegetable' ELSE 'Other' END AS Category, COUNT(*) AS Count FROM
+            Groceries GROUP BY CASE CategoryCode WHEN 'F' THEN 'Fruit' WHEN 'V'
+            THEN 'Vegetable' ELSE 'Other' END;
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try CASE in Aggregation!</h3>
+          <div class="example-input">
+            <label>Category Code:</label>
+            <input
+              type="text"
+              id="caseCategory"
+              value="F"
+              placeholder="Enter code (F, V, S, etc.)"
+            />
+            <label>Label:</label>
+            <input
+              type="text"
+              id="caseLabel"
+              value="Fruit"
+              placeholder="Enter label"
+            />
+            <button onclick="applyCaseAggregation()">Apply CASE</button>
+          </div>
+          <div class="example-result" id="caseAggregationResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Category</th>
+                <th>Count</th>
+              </tr>
+              <tr>
+                <td>Fruit</td>
+                <td>2</td>
+              </tr>
+              <tr>
+                <td>Vegetable</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>Other</td>
+                <td>2</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Tab -->
+      <div id="summary" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📋 Summary
+        </h2>
+        <table class="summary-table">
+          <tr>
+            <th>Concept</th>
+            <th>Clause/Function</th>
+            <th>Purpose</th>
+          </tr>
+          <tr>
+            <td>Summarize Totals</td>
+            <td>`SUM()`</td>
+            <td>Add values</td>
+          </tr>
+          <tr>
+            <td>Calculate Average</td>
+            <td>`AVG()`</td>
+            <td>Mean of values</td>
+          </tr>
+          <tr>
+            <td>Count Entries</td>
+            <td>`COUNT(*)`</td>
+            <td>Rows in group</td>
+          </tr>
+          <tr>
+            <td>Create Groups</td>
+            <td>`GROUP BY`</td>
+            <td>Split rows into categories</td>
+          </tr>
+          <tr>
+            <td>Filter Groups</td>
+            <td>`HAVING`</td>
+            <td>Apply condition after grouping</td>
+          </tr>
+          <tr>
+            <td>Handle NULLs</td>
+            <td>`ISNULL()`</td>
+            <td>Replace NULL with default</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        // Hide all tab contents
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => (content.style.display = "none"));
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show selected tab content
+        document.getElementById(tabName).style.display = "block";
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+
+      function applyAggregateFunction() {
+        const func = document.getElementById("aggregateFunction").value;
+        const column = document.getElementById("aggregateColumn").value;
+        const result = document.getElementById("aggregateResult");
+
+        // Simulate aggregation
+        let value;
+        switch (func) {
+          case "sum":
+            value = 60;
+            break;
+          case "avg":
+            value = 80;
+            break;
+          case "count":
+            value = 3;
+            break;
+          case "max":
+            value = 95;
+            break;
+          case "min":
+            value = 60;
+            break;
+        }
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Function</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>${func.toUpperCase()}(${column})</td>
+                        <td>${value}</td>
+                    </tr>
+                </table>
+            `;
+      }
+
+      function applyGroupBy() {
+        const groupBy = document.getElementById("groupByColumn").value;
+        const aggregateFunc = document.getElementById("groupByAggregate").value;
+        const aggregateCol = document.getElementById(
+          "aggregateColumnGroup"
+        ).value;
+        const result = document.getElementById("groupbyResult");
+
+        // Simulate grouping
+        let groupedData = [
+          { [groupBy]: "Homework", [aggregateCol]: 86 },
+          { [groupBy]: "Quiz", [aggregateCol]: 77 },
+        ];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>${groupBy}</th>
+                        <th>${aggregateFunc.toUpperCase()}(${aggregateCol})</th>
+                    </tr>
+                    ${groupedData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item[groupBy]}</td>
+                            <td>${item[aggregateCol]}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      function applyHaving() {
+        const groupBy = document.getElementById("havingGroupBy").value;
+        const aggregateFunc = document.getElementById("havingAggregate").value;
+        const aggregateCol = document.getElementById(
+          "havingAggregateColumn"
+        ).value;
+        const condition = document.getElementById("havingCondition").value;
+        const result = document.getElementById("havingResult");
+
+        // Simulate HAVING filter
+        let filteredData = [
+          { [groupBy]: "Hailey", [aggregateCol]: 71.5 },
+          { [groupBy]: "Isabella", [aggregateCol]: 93.5 },
+        ];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>${groupBy}</th>
+                        <th>${aggregateFunc.toUpperCase()}(${aggregateCol})</th>
+                    </tr>
+                    ${filteredData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item[groupBy]}</td>
+                            <td>${item[aggregateCol]}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      function applyCaseAggregation() {
+        const category = document.getElementById("caseCategory").value;
+        const label = document.getElementById("caseLabel").value;
+        const result = document.getElementById("caseAggregationResult");
+
+        // Simulate CASE aggregation
+        let aggregationData = [
+          { Category: label, Count: 2 },
+          { Category: "Vegetable", Count: 1 },
+          { Category: "Other", Count: 2 },
+        ];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Category</th>
+                        <th>Count</th>
+                    </tr>
+                    ${aggregationData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item.Category}</td>
+                            <td>${item.Count}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      // Initialize interactive examples
+      applyAggregateFunction();
+      applyGroupBy();
+      applyHaving();
+      applyCaseAggregation();
+    </script>
+  </body>
+</html>

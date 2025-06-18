@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Joins Mastery Guide - How Joins Really Work</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #2c3e50, #3498db);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 2.5em;
+        font-weight: 300;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .mentor-quote {
+        background: linear-gradient(135deg, #ff6b6b, #feca57);
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        position: relative;
+        font-style: italic;
+        font-size: 1.1em;
+      }
+
+      .mentor-quote::before {
+        content: "💡";
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: white;
+        padding: 10px;
+        border-radius: 50%;
+        font-size: 1.5em;
+      }
+
+      .reality-check {
+        background: #ff6b6b;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        border-left: 5px solid #ff4757;
+      }
+
+      .reality-check h3 {
+        margin-top: 0;
+        color: white;
+      }
+
+      .business-scenario {
+        background: #e8f6f3;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #27ae60;
+        margin: 20px 0;
+      }
+
+      .sample-tables {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 40px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+      }
+
+      .table-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .table-title {
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9em;
+      }
+
+      th,
+      td {
+        padding: 8px 12px;
+        text-align: left;
+        border: 1px solid #ddd;
+      }
+
+      th {
+        background: #34495e;
+        color: white;
+        font-weight: 500;
+      }
+
+      tr:nth-child(even) {
+        background: #f8f9fa;
+      }
+
+      .join-section {
+        margin-bottom: 50px;
+        padding: 25px;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .join-title {
+        color: #2c3e50;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+      }
+
+      .join-explanation {
+        display: grid;
+        grid-template-columns: minmax(300px, 1fr) 2fr;
+        gap: 30px;
+        align-items: start;
+      }
+
+      .visual-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tabular-diagram {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 2px solid #ddd;
+      }
+
+      .diagram-tables {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .diagram-table {
+        background: white;
+        border-radius: 5px;
+        padding: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .diagram-table h4 {
+        margin: 0 0 10px 0;
+        font-size: 0.9em;
+        color: #2c3e50;
+      }
+
+      .diagram-row {
+        padding: 5px 10px;
+        margin: 2px 0;
+        border-radius: 3px;
+        font-size: 0.8em;
+        text-align: center;
+        min-width: 40px;
+      }
+
+      .left-table .diagram-row {
+        background: #3498db;
+        color: white;
+      }
+
+      .right-table .diagram-row {
+        background: #e74c3c;
+        color: white;
+      }
+
+      .result-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 10px 0;
+        font-weight: bold;
+      }
+
+      .arrow {
+        font-size: 1.5em;
+        color: #f39c12;
+      }
+
+      .result-rows {
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid #27ae60;
+      }
+
+      .result-row {
+        padding: 3px 8px;
+        margin: 2px;
+        background: #27ae60;
+        color: white;
+        border-radius: 3px;
+        font-size: 0.8em;
+        display: inline-block;
+      }
+
+      .null-value {
+        background: #95a5a6 !important;
+      }
+
+      .cartesian-explanation {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+      }
+
+      .cartesian-explanation h3 {
+        color: #856404;
+        margin-top: 0;
+      }
+
+      .venn-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+      }
+
+      .venn-diagram {
+        width: 250px;
+        height: 150px;
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      .circle {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 3px solid;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+
+      .left-circle {
+        left: 0;
+        top: 15px;
+        background: rgba(52, 152, 219, 0.3);
+        border-color: #3498db;
+        color: #2c3e50;
+      }
+
+      .right-circle {
+        right: 0;
+        top: 15px;
+        background: rgba(231, 76, 60, 0.3);
+        border-color: #e74c3c;
+        color: #2c3e50;
+      }
+
+      .result-table {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .sql-code {
+        background: #2c3e50;
+        color: #ecf0f1;
+        padding: 15px;
+        border-radius: 5px;
+        font-family: "Courier New", monospace;
+        margin: 15px 0;
+        overflow-x: auto;
+        font-size: 0.9em;
+      }
+
+      .use-case {
+        background: #e8f6f3;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #27ae60;
+        margin-top: 15px;
+      }
+
+      .use-case strong {
+        color: #27ae60;
+      }
+
+      .performance-tip {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 5px;
+        padding: 15px;
+        margin-top: 15px;
+      }
+
+      .performance-tip::before {
+        content: "⚡ ";
+        font-weight: bold;
+        color: #f39c12;
+      }
+
+      /* Special styling for different join types */
+      .inner-join .left-circle,
+      .inner-join .right-circle {
+        background: rgba(46, 204, 113, 0.4);
+        border-color: #2ecc71;
+      }
+
+      .left-join .left-circle {
+        background: rgba(52, 152, 219, 0.6);
+      }
+
+      .left-join .right-circle {
+        background: rgba(52, 152, 219, 0.2);
+      }
+
+      .right-join .right-circle {
+        background: rgba(231, 76, 60, 0.6);
+      }
+
+      .right-join .left-circle {
+        background: rgba(231, 76, 60, 0.2);
+      }
+
+      .full-join .left-circle,
+      .full-join .right-circle {
+        background: rgba(155, 89, 182, 0.4);
+        border-color: #9b59b6;
+      }
+
+      .cross-join .venn-diagram {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(241, 196, 15, 0.2);
+        border: 3px solid #f1c40f;
+        border-radius: 10px;
+      }
+
+      .foundation-section {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin: 30px 0;
+      }
+
+      .foundation-section h2 {
+        color: white;
+        border-bottom: 3px solid white;
+        padding-bottom: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .sample-tables {
+          grid-template-columns: 1fr;
+        }
+
+        .join-explanation {
+          grid-template-columns: 1fr;
+        }
+
+        .diagram-tables {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>SQL Joins Mastery Guide</h1>
+        <p>Understanding How Joins Really Work Behind the Scenes</p>
+      </div>
+
+      <div class="content">
+        <!-- Master's Introduction -->
+        <div class="mentor-quote">
+          "Joints are the glue that holds your data together, making them an
+          essential skill for anyone working with data. Whether you're building
+          apps, analyzing data, or generating reports, mastering joints is your
+          ticket to working smarter, not harder."
+          <br /><br /><strong>- SQL Master Mentor</strong>
+        </div>
+
+        <!-- Business Scenario -->
+        <div class="business-scenario">
+          <h3>🛒 Real-World Scenario: Online Store Management</h3>
+          <p>
+            Imagine you're managing an online store with separate tables for
+            customers and orders. Without joins, retrieving data that links
+            customers to their orders would require multiple queries and manual
+            combination - inefficient and error-prone!
+          </p>
+          <p>
+            <strong>The Solution:</strong> Joins allow you to retrieve data from
+            multiple related tables in a single query, making data access
+            faster, more organized, and scalable.
+          </p>
+        </div>
+
+        <!-- The Reality About Joins -->
+        <div class="reality-check">
+          <h3>🚨 The Truth About How Joins Actually Work</h3>
+          <p>
+            <strong>Here's what most tutorials don't tell you:</strong> Venn
+            diagrams are popular for explaining SQL joins, but they deal with
+            <em>sets</em>, not <em>rows</em>. They don't fully capture how joins
+            actually work behind the scenes.
+          </p>
+          <p>
+            <strong>The Reality:</strong> Every join starts as a
+            <strong>Cartesian Product</strong> - every row of one table
+            multiplied by every row of another - then applies filters to select
+            matching rows.
+          </p>
+        </div>
+
+        <!-- Foundation: Cartesian Product -->
+        <div class="foundation-section">
+          <h2>🔧 The Foundation: Understanding Cartesian Product</h2>
+          <div class="cartesian-explanation">
+            <h3>🧮 The Math Behind Joins</h3>
+            <p>
+              If you have <strong>3 rows</strong> in one table and
+              <strong>4 rows</strong> in another, a CROSS JOIN gives you
+              <strong>3 × 4 = 12</strong> result rows. This is the foundation -
+              all other join types are built on this concept but add filters or
+              unions of unmatched rows.
+            </p>
+          </div>
+
+          <div
+            style="
+              background: rgba(255, 255, 255, 0.1);
+              padding: 20px;
+              border-radius: 10px;
+              margin-top: 20px;
+            "
+          >
+            <h3>Why This Matters for Performance:</h3>
+            <ul>
+              <li>
+                <strong>Large tables without proper indexes</strong> → Massive
+                Cartesian products → Slow queries
+              </li>
+              <li>
+                <strong>Proper join conditions + indexes</strong> → Efficient
+                filtering → Fast queries
+              </li>
+              <li>
+                <strong
+                  >Understanding this helps you write better queries</strong
+                >
+                and avoid performance pitfalls
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Sample Tables -->
+        <div class="sample-tables">
+          <div class="table-container">
+            <div class="table-title">👥 Customers Table</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>customer_id</th>
+                  <th>name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Alice</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Bob</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>Charlie</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-container">
+            <div class="table-title">📦 Orders Table</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>order_id</th>
+                  <th>customer_id</th>
+                  <th>product</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>101</td>
+                  <td>1</td>
+                  <td>Laptop</td>
+                </tr>
+                <tr>
+                  <td>102</td>
+                  <td>2</td>
+                  <td>Phone</td>
+                </tr>
+                <tr>
+                  <td>103</td>
+                  <td>2</td>
+                  <td>Tablet</td>
+                </tr>
+                <tr>
+                  <td>104</td>
+                  <td>99</td>
+                  <td>Mouse</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- INNER JOIN -->
+        <div class="join-section inner-join">
+          <h2 class="join-title">1. INNER JOIN - The Common Ground</h2>
+          <div class="join-explanation">
+            <div class="visual-container">
+              <div class="tabular-diagram">
+                <div class="diagram-tables">
+                  <div class="diagram-table left-table">
+                    <h4>Customers</h4>
+                    <div class="diagram-row">1</div>
+                    <div class="diagram-row" style="background: #27ae60">2</div>
+                    <div class="diagram-row">3</div>
+                  </div>
+                  <div class="diagram-table right-table">
+                    <h4>Orders</h4>
+                    <div class="diagram-row" style="background: #27ae60">A</div>
+                    <div class="diagram-row" style="background: #27ae60">B</div>
+                    <div class="diagram-row" style="background: #27ae60">C</div>
+                    <div class="diagram-row">D</div>
+                  </div>
+                </div>
+                <div class="result-indicator">
+                  <span>Matches Only</span>
+                  <span class="arrow">→</span>
+                  <div class="result-rows">
+                    <div class="result-row">2-A</div>
+                    <div class="result-row">2-B</div>
+                    <div class="result-row">2-C</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="venn-container">
+                <div class="venn-diagram">
+                  <div class="circle left-circle">Customers</div>
+                  <div class="circle right-circle">Orders</div>
+                </div>
+                <div style="font-weight: bold; color: #2ecc71">
+                  Only Matching Records
+                </div>
+              </div>
+            </div>
+
+            <div class="result-table">
+              <div class="sql-code">
+                SELECT customers.name, orders.product FROM customers INNER JOIN
+                orders ON customers.customer_id = orders.customer_id;
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>name</th>
+                    <th>product</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Alice</td>
+                    <td>Laptop</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Phone</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Tablet</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="use-case">
+                <strong>Perfect for:</strong> Retrieving only customers who have
+                made purchases. Most commonly used in transactional systems
+                where you need relevant data from related tables.
+              </div>
+              <div class="performance-tip">
+                Fastest join type with proper indexing. The database can
+                eliminate non-matching rows early in the process.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEFT JOIN -->
+        <div class="join-section left-join">
+          <h2 class="join-title">
+            2. LEFT JOIN - Keep Everything from the Left
+          </h2>
+          <div class="join-explanation">
+            <div class="visual-container">
+              <div class="tabular-diagram">
+                <div class="diagram-tables">
+                  <div class="diagram-table left-table">
+                    <h4>Customers</h4>
+                    <div class="diagram-row" style="background: #3498db">1</div>
+                    <div class="diagram-row" style="background: #3498db">2</div>
+                    <div class="diagram-row" style="background: #3498db">3</div>
+                  </div>
+                  <div class="diagram-table right-table">
+                    <h4>Orders</h4>
+                    <div class="diagram-row" style="background: #3498db">A</div>
+                    <div class="diagram-row" style="background: #3498db">B</div>
+                    <div class="diagram-row" style="background: #3498db">C</div>
+                    <div class="diagram-row">D</div>
+                  </div>
+                </div>
+                <div class="result-indicator">
+                  <span>All Left + Matches</span>
+                  <span class="arrow">→</span>
+                  <div class="result-rows">
+                    <div class="result-row">1-NULL</div>
+                    <div class="result-row">2-A</div>
+                    <div class="result-row">2-B</div>
+                    <div class="result-row">2-C</div>
+                    <div class="result-row">3-NULL</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="venn-container">
+                <div class="venn-diagram">
+                  <div class="circle left-circle">Customers</div>
+                  <div class="circle right-circle">Orders</div>
+                </div>
+                <div style="font-weight: bold; color: #3498db">
+                  All Left + Matching Right
+                </div>
+              </div>
+            </div>
+
+            <div class="result-table">
+              <div class="sql-code">
+                SELECT customers.name, orders.product FROM customers LEFT JOIN
+                orders ON customers.customer_id = orders.customer_id;
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>name</th>
+                    <th>product</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Alice</td>
+                    <td>Laptop</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Phone</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Tablet</td>
+                  </tr>
+                  <tr>
+                    <td>Charlie</td>
+                    <td>NULL</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="use-case">
+                <strong>Perfect for:</strong> Reports showing all customers,
+                including those who haven't made purchases. Widely used in
+                analytics where missing values are still meaningful.
+              </div>
+              <div class="performance-tip">
+                Great for finding gaps in data. Use WHERE right_table.column IS
+                NULL to find customers without orders.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT JOIN -->
+        <div class="join-section right-join">
+          <h2 class="join-title">
+            3. RIGHT JOIN - Keep Everything from the Right
+          </h2>
+          <div class="join-explanation">
+            <div class="visual-container">
+              <div class="tabular-diagram">
+                <div class="diagram-tables">
+                  <div class="diagram-table left-table">
+                    <h4>Customers</h4>
+                    <div class="diagram-row" style="background: #e74c3c">1</div>
+                    <div class="diagram-row" style="background: #e74c3c">2</div>
+                    <div class="diagram-row">3</div>
+                  </div>
+                  <div class="diagram-table right-table">
+                    <h4>Orders</h4>
+                    <div class="diagram-row" style="background: #e74c3c">A</div>
+                    <div class="diagram-row" style="background: #e74c3c">B</div>
+                    <div class="diagram-row" style="background: #e74c3c">C</div>
+                    <div class="diagram-row" style="background: #e74c3c">D</div>
+                  </div>
+                </div>
+                <div class="result-indicator">
+                  <span>All Right + Matches</span>
+                  <span class="arrow">→</span>
+                  <div class="result-rows">
+                    <div class="result-row">1-A</div>
+                    <div class="result-row">2-B</div>
+                    <div class="result-row">2-C</div>
+                    <div class="result-row null-value">NULL-D</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="venn-container">
+                <div class="venn-diagram">
+                  <div class="circle left-circle">Customers</div>
+                  <div class="circle right-circle">Orders</div>
+                </div>
+                <div style="font-weight: bold; color: #e74c3c">
+                  All Right + Matching Left
+                </div>
+              </div>
+            </div>
+
+            <div class="result-table">
+              <div class="sql-code">
+                SELECT customers.name, orders.product FROM customers RIGHT JOIN
+                orders ON customers.customer_id = orders.customer_id;
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>name</th>
+                    <th>product</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Alice</td>
+                    <td>Laptop</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Phone</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Tablet</td>
+                  </tr>
+                  <tr>
+                    <td>NULL</td>
+                    <td>Mouse</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="use-case">
+                <strong>Perfect for:</strong> Retrieving all orders, even those
+                without valid customers. Less commonly used but useful when
+                focus is on the right-side table.
+              </div>
+              <div class="performance-tip">
+                Can often be rewritten as LEFT JOIN by switching table order,
+                which is more intuitive for most developers.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FULL OUTER JOIN -->
+        <div class="join-section full-join">
+          <h2 class="join-title">
+            4. FULL OUTER JOIN - The All-Inclusive Version
+          </h2>
+          <div class="join-explanation">
+            <div class="visual-container">
+              <div class="tabular-diagram">
+                <div class="diagram-tables">
+                  <div class="diagram-table left-table">
+                    <h4>Customers</h4>
+                    <div class="diagram-row" style="background: #9b59b6">1</div>
+                    <div class="diagram-row" style="background: #9b59b6">2</div>
+                    <div class="diagram-row" style="background: #9b59b6">3</div>
+                  </div>
+                  <div class="diagram-table right-table">
+                    <h4>Orders</h4>
+                    <div class="diagram-row" style="background: #9b59b6">A</div>
+                    <div class="diagram-row" style="background: #9b59b6">B</div>
+                    <div class="diagram-row" style="background: #9b59b6">C</div>
+                    <div class="diagram-row" style="background: #9b59b6">D</div>
+                  </div>
+                </div>
+                <div class="result-indicator">
+                  <span>Everyone Included</span>
+                  <span class="arrow">→</span>
+                  <div class="result-rows">
+                    <div class="result-row">1-A</div>
+                    <div class="result-row">2-B</div>
+                    <div class="result-row">2-C</div>
+                    <div class="result-row null-value">3-NULL</div>
+                    <div class="result-row null-value">NULL-D</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="venn-container">
+                <div class="venn-diagram">
+                  <div class="circle left-circle">Customers</div>
+                  <div class="circle right-circle">Orders</div>
+                </div>
+                <div style="font-weight: bold; color: #9b59b6">
+                  All Records from Both
+                </div>
+              </div>
+            </div>
+
+            <div class="result-table">
+              <div class="sql-code">
+                SELECT customers.name, orders.product FROM customers FULL OUTER
+                JOIN orders ON customers.customer_id = orders.customer_id;
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>name</th>
+                    <th>product</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Alice</td>
+                    <td>Laptop</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Phone</td>
+                  </tr>
+                  <tr>
+                    <td>Bob</td>
+                    <td>Tablet</td>
+                  </tr>
+                  <tr>
+                    <td>Charlie</td>
+                    <td>NULL</td>
+                  </tr>
+                  <tr>
+                    <td>NULL</td>
+                    <td>Mouse</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="use-case">
+                <strong>Perfect for:</strong> Data reconciliation tasks where
+                you need to see all records from both tables, identifying gaps
+                in either direction.
+              </div>
+              <div class="performance-tip">
+                Most resource-intensive join. Every row from both tables is
+                included with NULL cells where no match exists.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CROSS JOIN -->
+        <div class="join-section cross-join">
+          <h2 class="join-title">5. CROSS JOIN - Every Possible Combination</h2>
+          <div class="join-explanation">
+            <div class="visual-container">
+              <div class="tabular-diagram">
+                <div class="diagram-tables">
+                  <div class="diagram-table left-table">
+                    <h4>Customers (3 rows)</h4>
+                    <div class="diagram-row">1</div>
+                    <div class="diagram-row">2</div>
+                    <div class="diagram-row">3</div>
+                  </div>
+                  <div class="diagram-table right-table">
+                    <h4>Orders (4 rows)</h4>
+                    <div class="diagram-row">A</div>
+                    <div class="diagram-row">B</div>
+                    <div class="diagram-row">C</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

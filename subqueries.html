@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Subqueries Visual Guide</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .function-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: rgb(0, 0, 0);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .function-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .function-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .function-purpose {
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .function-example {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .interactive-example {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .example-input {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .example-input input,
+      .example-input select {
+        padding: 8px 12px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .example-result {
+        background: #d4edda;
+        border: 2px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s ease;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .tips {
+        background: #e3f2fd;
+        border-left: 5px solid #2196f3;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+      }
+
+      .tips h3 {
+        color: #1976d2;
+        margin-bottom: 10px;
+      }
+
+      .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .summary-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .summary-table tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SQL Subqueries Visual Guide</h1>
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('overview')">🔍 Overview</div>
+        <div class="tab" onclick="showTab('where')">📍 WHERE</div>
+        <div class="tab" onclick="showTab('from')">📦 FROM</div>
+        <div class="tab" onclick="showTab('select')">🧮 SELECT</div>
+        <div class="tab" onclick="showTab('correlated')">🔄 Correlated</div>
+        <div class="tab" onclick="showTab('exists')">✅ EXISTS</div>
+        <div class="tab" onclick="showTab('cte')">📌 CTE</div>
+        <div class="tab" onclick="showTab('summary')">📋 Summary</div>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="overview" class="tab-content active">
+        <div class="function-card">
+          <div class="function-name">Subqueries in SQL</div>
+          <div class="function-purpose">
+            Mini-queries embedded within larger SQL statements
+          </div>
+          <div class="function-example">
+            SELECT columnlist FROM table WHERE column IN (SELECT column FROM
+            othertable);
+          </div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 Key Concepts</h3>
+          <p>
+            Subqueries allow SQL to answer layered questions by embedding one
+            SELECT statement inside another. They can be used in WHERE, FROM, or
+            SELECT clauses, and can be either correlated (dependent on outer
+            query) or uncorrelated (independent).
+          </p>
+        </div>
+      </div>
+
+      <!-- WHERE Tab -->
+      <div id="where" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📍 Subquery in WHERE
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Filtering with Subqueries</div>
+          <div class="function-purpose">
+            Use a subquery to filter results based on conditions
+          </div>
+          <div class="function-example">
+            SELECT UserName FROM Users WHERE UserID IN ( SELECT UserID FROM
+            Transactions WHERE TransactionType = 'Cash' );
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Subquery in WHERE!</h3>
+          <div class="example-input">
+            <label>Main Query Column:</label>
+            <input
+              type="text"
+              id="whereMainColumn"
+              value="UserName"
+              placeholder="Enter column"
+            />
+            <label>Subquery Table:</label>
+            <input
+              type="text"
+              id="whereSubTable"
+              value="Transactions"
+              placeholder="Enter table"
+            />
+            <label>Subquery Condition:</label>
+            <input
+              type="text"
+              id="whereSubCondition"
+              value="TransactionType = 'Cash'"
+              placeholder="Enter condition"
+            />
+            <button onclick="applyWhereSubquery()">Execute Query</button>
+          </div>
+          <div class="example-result" id="whereResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>UserName</th>
+              </tr>
+              <tr>
+                <td>John Doe</td>
+              </tr>
+              <tr>
+                <td>Jane Smith</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- FROM Tab -->
+      <div id="from" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📦 Subquery in FROM
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Virtual Tables</div>
+          <div class="function-purpose">
+            Create a temporary table to JOIN with
+          </div>
+          <div class="function-example">
+            SELECT UserName, ISNULL(CashTransactions.TotalCash, 0) AS 'Total
+            Cash' FROM Users LEFT JOIN ( SELECT UserID, SUM(TransactionAmount)
+            AS TotalCash FROM Transactions WHERE TransactionType = 'Cash' GROUP
+            BY UserID ) AS CashTransactions ON Users.UserID =
+            CashTransactions.UserID;
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Subquery in FROM!</h3>
+          <div class="example-input">
+            <label>Main Query Table:</label>
+            <input
+              type="text"
+              id="fromMainTable"
+              value="Users"
+              placeholder="Enter table"
+            />
+            <label>Subquery Alias:</label>
+            <input
+              type="text"
+              id="fromSubAlias"
+              value="CashTransactions"
+              placeholder="Enter alias"
+            />
+            <label>Subquery Aggregate:</label>
+            <input
+              type="text"
+              id="fromSubAggregate"
+              value="SUM(TransactionAmount) AS TotalCash"
+              placeholder="Enter aggregate"
+            />
+            <button onclick="applyFromSubquery()">Execute Query</button>
+          </div>
+          <div class="example-result" id="fromResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>UserName</th>
+                <th>Total Cash</th>
+              </tr>
+              <tr>
+                <td>John Doe</td>
+                <td>$50.00</td>
+              </tr>
+              <tr>
+                <td>Jane Smith</td>
+                <td>$120.00</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SELECT Tab -->
+      <div id="select" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🧮 Subquery in SELECT
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Calculated Columns</div>
+          <div class="function-purpose">Calculate values for each row</div>
+          <div class="function-example">
+            SELECT UserName, (SELECT COUNT(*) FROM Transactions WHERE
+            Users.UserID = Transactions.UserID) AS 'Number of Transactions' FROM
+            Users;
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Subquery in SELECT!</h3>
+          <div class="example-input">
+            <label>Main Query Column:</label>
+            <input
+              type="text"
+              id="selectMainColumn"
+              value="UserName"
+              placeholder="Enter column"
+            />
+            <label>Subquery Table:</label>
+            <input
+              type="text"
+              id="selectSubTable"
+              value="Transactions"
+              placeholder="Enter table"
+            />
+            <label>Subquery Calculation:</label>
+            <input
+              type="text"
+              id="selectSubCalculation"
+              value="COUNT(*) AS 'Number of Transactions'"
+              placeholder="Enter calculation"
+            />
+            <button onclick="applySelectSubquery()">Execute Query</button>
+          </div>
+          <div class="example-result" id="selectResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>UserName</th>
+                <th>Number of Transactions</th>
+              </tr>
+              <tr>
+                <td>John Doe</td>
+                <td>5</td>
+              </tr>
+              <tr>
+                <td>Jane Smith</td>
+                <td>8</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Correlated Tab -->
+      <div id="correlated" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🔄 Correlated Subqueries
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">Correlated Subqueries</div>
+          <div class="function-purpose">
+            Subqueries that reference outer query columns
+          </div>
+          <div class="function-example">
+            SELECT UserName FROM Users WHERE ( SELECT SUM(TransactionAmount)
+            FROM Transactions WHERE Users.UserID = Transactions.UserID ) < 20;
+          </div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 Correlated vs Uncorrelated</h3>
+          <p>
+            Correlated subqueries depend on the outer query and must be
+            evaluated row-by-row. Uncorrelated subqueries run independently and
+            can be reused.
+          </p>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try Correlated Subquery!</h3>
+          <div class="example-input">
+            <label>Main Query Table:</label>
+            <input
+              type="text"
+              id="correlatedMainTable"
+              value="Users"
+              placeholder="Enter table"
+            />
+            <label>Subquery Table:</label>
+            <input
+              type="text"
+              id="correlatedSubTable"
+              value="Transactions"
+              placeholder="Enter table"
+            />
+            <label>Comparison Value:</label>
+            <input type="number" id="correlatedValue" value="20" min="1" />
+            <button onclick="applyCorrelatedSubquery()">Execute Query</button>
+          </div>
+          <div class="example-result" id="correlatedResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>UserName</th>
+              </tr>
+              <tr>
+                <td>John Doe</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXISTS Tab -->
+      <div id="exists" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          ✅ EXISTS vs IN
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">EXISTS</div>
+          <div class="function-purpose">
+            Check if any row exists matching the condition
+          </div>
+          <div class="function-example">
+            SELECT UserName FROM Users WHERE EXISTS ( SELECT * FROM Transactions
+            WHERE Users.UserID = Transactions.UserID );
+          </div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 EXISTS vs IN</h3>
+          <p>
+            EXISTS checks for existence (faster on large datasets), while IN
+            matches against a list of values. EXISTS typically performs better
+            with large result sets.
+          </p>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try EXISTS!</h3>
+          <div class="example-input">
+            <label>Main Query Table:</label>
+            <input
+              type="text"
+              id="existsMainTable"
+              value="Users"
+              placeholder="Enter table"
+            />
+            <label>Subquery Table:</label>
+            <input
+              type="text"
+              id="existsSubTable"
+              value="Transactions"
+              placeholder="Enter table"
+            />
+            <button onclick="applyExistsSubquery()">Execute Query</button>
+          </div>
+          <div class="example-result" id="existsResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>UserName</th>
+              </tr>
+              <tr>
+                <td>John Doe</td>
+              </tr>
+              <tr>
+                <td>Jane Smith</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTE Tab -->
+      <div id="cte" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📌 Common Table Expressions (CTE)
+        </h2>
+
+        <div class="function-card">
+          <div class="function-name">CTE as Alternative</div>
+          <div class="function-purpose">
+            Named temporary result set for complex logic
+          </div>
+          <div class="function-example">
+            WITH CashTransactions AS ( SELECT UserID, SUM(TransactionAmount) AS
+            TotalCash FROM Transactions WHERE TransactionType = 'Cash' GROUP BY
+            UserID ) SELECT UserName, ISNULL(CashTransactions.TotalCash, 0) AS
+            'Total Cash' FROM Users LEFT JOIN CashTransactions ON Users.UserID =
+            CashTransactions.UserID;
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>Try CTE!</h3>
+          <div class="example-input">
+            <label>CTE Name:</label>
+            <input
+              type="text"
+              id="cteName"
+              value="CashTransactions"
+              placeholder="Enter CTE name"
+            />
+            <label>CTE Aggregate:</label>
+            <input
+              type="text"
+              id="cteAggregate"
+              value="SUM(TransactionAmount) AS TotalCash"
+              placeholder="Enter aggregate"
+            />
+            <label>Main Query Table:</label>
+            <input
+              type="text"
+              id="cteMainTable"
+              value="Users"
+              placeholder="Enter table"
+            />
+            <button onclick="applyCte()">Execute CTE</button>
+          </div>
+          <div class="example-result" id="cteResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>UserName</th>
+                <th>Total Cash</th>
+              </tr>
+              <tr>
+                <td>John Doe</td>
+                <td>$50.00</td>
+              </tr>
+              <tr>
+                <td>Jane Smith</td>
+                <td>$120.00</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Tab -->
+      <div id="summary" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📋 Summary
+        </h2>
+        <table class="summary-table">
+          <tr>
+            <th>Subquery Location</th>
+            <th>Example Use</th>
+            <th>Tip</th>
+          </tr>
+          <tr>
+            <td>`WHERE`</td>
+            <td>Filter users based on conditions</td>
+            <td>Use with `IN`, `=`, `EXISTS`</td>
+          </tr>
+          <tr>
+            <td>`FROM`</td>
+            <td>Build a virtual table to JOIN</td>
+            <td>Must assign an alias</td>
+          </tr>
+          <tr>
+            <td>`SELECT`</td>
+            <td>Calculate values like counts or sums</td>
+            <td>Often needs `GROUP BY` outside</td>
+          </tr>
+          <tr>
+            <td>Correlated</td>
+            <td>References outer query, row-by-row</td>
+            <td>Must run inside full query</td>
+          </tr>
+          <tr>
+            <td>Uncorrelated</td>
+            <td>Runs independently, once</td>
+            <td>Like standalone queries</td>
+          </tr>
+          <tr>
+            <td>`EXISTS`</td>
+            <td>Checks for row existence</td>
+            <td>Efficient for presence check</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        // Hide all tab contents
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => (content.style.display = "none"));
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show selected tab content
+        document.getElementById(tabName).style.display = "block";
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+
+      function applyWhereSubquery() {
+        const mainColumn = document.getElementById("whereMainColumn").value;
+        const subTable = document.getElementById("whereSubTable").value;
+        const subCondition = document.getElementById("whereSubCondition").value;
+        const result = document.getElementById("whereResult");
+
+        // Simulate subquery results
+        let whereData = [
+          { [mainColumn]: "John Doe" },
+          { [mainColumn]: "Jane Smith" },
+        ];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>${mainColumn}</th>
+                    </tr>
+                    ${whereData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item[mainColumn]}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      function applyFromSubquery() {
+        const mainTable = document.getElementById("fromMainTable").value;
+        const subAlias = document.getElementById("fromSubAlias").value;
+        const subAggregate = document.getElementById("fromSubAggregate").value;
+        const result = document.getElementById("fromResult");
+
+        // Simulate subquery results
+        let fromData = [
+          { UserName: "John Doe", "Total Cash": "$50.00" },
+          { UserName: "Jane Smith", "Total Cash": "$120.00" },
+        ];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>UserName</th>
+                        <th>Total Cash</th>
+                    </tr>
+                    ${fromData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item.UserName}</td>
+                            <td>${item["Total Cash"]}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      function applySelectSubquery() {
+        const mainColumn = document.getElementById("selectMainColumn").value;
+        const subTable = document.getElementById("selectSubTable").value;
+        const subCalculation = document.getElementById(
+          "selectSubCalculation"
+        ).value;
+        const result = document.getElementById("selectResult");
+
+        // Simulate subquery results
+        let selectData = [
+          { [mainColumn]: "John Doe", "Number of Transactions": 5 },
+          { [mainColumn]: "Jane Smith", "Number of Transactions": 8 },
+        ];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>${mainColumn}</th>
+                        <th>Number of Transactions</th>
+                    </tr>
+                    ${selectData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item[mainColumn]}</td>
+                            <td>${item["Number of Transactions"]}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      function applyCorrelatedSubquery() {
+        const mainTable = document.getElementById("correlatedMainTable").value;
+        const subTable = document.getElementById("correlatedSubTable").value;
+        const value = document.getElementById("correlatedValue").value;
+        const result = document.getElementById("correlatedResult");
+
+        // Simulate correlated subquery results
+        let correlatedData = [{ UserName: "John Doe" }];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>UserName</th>
+                    </tr>
+                    ${correlatedData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item.UserName}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      function applyExistsSubquery() {
+        const mainTable = document.getElementById("existsMainTable").value;
+        const subTable = document.getElementById("existsSubTable").value;
+        const result = document.getElementById("existsResult");
+
+        // Simulate EXISTS subquery results
+        let existsData = [{ UserName: "John Doe" }, { UserName: "Jane Smith" }];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>UserName</th>
+                    </tr>
+                    ${existsData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item.UserName}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      function applyCte() {
+        const cteName = document.getElementById("cteName").value;
+        const cteAggregate = document.getElementById("cteAggregate").value;
+        const mainTable = document.getElementById("cteMainTable").value;
+        const result = document.getElementById("cteResult");
+
+        // Simulate CTE results
+        let cteData = [
+          { UserName: "John Doe", "Total Cash": "$50.00" },
+          { UserName: "Jane Smith", "Total Cash": "$120.00" },
+        ];
+
+        result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>UserName</th>
+                        <th>Total Cash</th>
+                    </tr>
+                    ${cteData
+                      .map(
+                        (item) => `
+                        <tr>
+                            <td>${item.UserName}</td>
+                            <td>${item["Total Cash"]}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </table>
+            `;
+      }
+
+      // Initialize interactive examples
+      applyWhereSubquery();
+      applyFromSubquery();
+      applySelectSubquery();
+      applyCorrelatedSubquery();
+      applyExistsSubquery();
+      applyCte();
+    </script>
+  </body>
+</html>

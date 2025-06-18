@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Selection Criteria Visual Guide</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .function-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: rgb(0, 0, 0);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .function-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .function-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .function-purpose {
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .function-example {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .hierarchy-diagram {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 20px 0;
+      }
+
+      .hierarchy-title {
+        text-align: center;
+        font-size: 1.8em;
+        margin-bottom: 30px;
+        color: #2c3e50;
+      }
+
+      .function-tree {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tree-level {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .tree-node {
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        padding: 15px 25px;
+        border-radius: 10px;
+        color: #2c3e50;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      .tree-node.root {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 1.2em;
+      }
+
+      .interactive-example {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .example-input {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .example-input input,
+      .example-input select {
+        padding: 8px 12px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .example-result {
+        background: #d4edda;
+        border: 2px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s ease;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .tips {
+        background: #e3f2fd;
+        border-left: 5px solid #2196f3;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+      }
+
+      .tips h3 {
+        color: #1976d2;
+        margin-bottom: 10px;
+      }
+
+      .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .summary-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .summary-table tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔍 SQL Selection Criteria Visual Guide</h1>
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('overview')">📊 Overview</div>
+        <div class="tab" onclick="showTab('basic')">💡 Basic WHERE</div>
+        <div class="tab" onclick="showTab('operators')">⚙️ Operators</div>
+        <div class="tab" onclick="showTab('like')">🔍 LIKE Patterns</div>
+        <div class="tab" onclick="showTab('limit')">🎯 Limit Rows</div>
+        <div class="tab" onclick="showTab('summary')">📋 Summary</div>
+      </div>
+
+      <!-- Overview Tab -->
+      <div id="overview" class="tab-content active">
+        <div class="hierarchy-diagram">
+          <h2 class="hierarchy-title">SQL Selection Criteria Hierarchy</h2>
+          <div class="function-tree">
+            <div class="tree-level">
+              <div class="tree-node root">SQL Selection</div>
+            </div>
+            <div class="tree-level">
+              <div class="tree-node">Basic WHERE</div>
+              <div class="tree-node">Operators</div>
+            </div>
+            <div class="tree-level">
+              <div class="tree-node">Pattern Matching (LIKE)</div>
+              <div class="tree-node">Limiting Rows</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips">
+          <h3>💡 Key Concepts</h3>
+          <p>
+            The <strong>WHERE</strong> clause is SQL's primary filtering tool:
+          </p>
+          <ul style="margin-left: 20px; margin-top: 10px">
+            <li>Filters rows based on conditions</li>
+            <li>Accepts relational operators (<, >, =, etc.)</li>
+            <li>Supports pattern matching with <strong>LIKE</strong></li>
+            <li>
+              Can limit result sets with <strong>TOP</strong> or
+              <strong>LIMIT</strong>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Basic WHERE Tab -->
+      <div id="basic" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          💡 Basic WHERE Filtering
+        </h2>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)"
+        >
+          <div class="function-name">Filter by Exact Match</div>
+          <div class="function-purpose">
+            Get rows where a column matches a specific value
+          </div>
+          <div class="function-example">
+            SELECT * FROM Employees WHERE LastName = 'Smith';
+          </div>
+        </div>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)"
+        >
+          <div class="function-name">Filter Numeric Values</div>
+          <div class="function-purpose">
+            Filter rows based on numeric comparisons
+          </div>
+          <div class="function-example">
+            SELECT * FROM Orders WHERE QuantityPurchased = 5;
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>🎯 Try Basic Filtering!</h3>
+          <div class="example-input">
+            <label>Column:</label>
+            <select id="filterColumn">
+              <option value="name">Name</option>
+              <option value="quantity">Quantity</option>
+              <option value="price">Price</option>
+            </select>
+            <label>Value:</label>
+            <input
+              type="text"
+              id="filterValue"
+              value="Smith"
+              placeholder="Enter value"
+            />
+            <button onclick="applyBasicFilter()">Filter Data</button>
+          </div>
+          <div class="example-result" id="basicFilterResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+              </tr>
+              <tr>
+                <td>John Smith</td>
+                <td>5</td>
+                <td>$25.00</td>
+              </tr>
+              <tr>
+                <td>Jane Doe</td>
+                <td>10</td>
+                <td>$15.00</td>
+              </tr>
+              <tr>
+                <td>Bob Johnson</td>
+                <td>3</td>
+                <td>$30.00</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operators Tab -->
+      <div id="operators" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          ⚙️ Relational Operators
+        </h2>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)"
+        >
+          <div class="function-name">Filter Greater Than</div>
+          <div class="function-purpose">
+            Get rows where a numeric value exceeds a threshold
+          </div>
+          <div class="function-example">
+            SELECT * FROM Orders WHERE TotalAmount > 100;
+          </div>
+        </div>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)"
+        >
+          <div class="function-name">Filter Less Than</div>
+          <div class="function-purpose">
+            Get rows where a numeric value is below a threshold
+          </div>
+          <div class="function-example">
+            SELECT * FROM Products WHERE Price < 50;
+          </div>
+        </div>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%)"
+        >
+          <div class="function-name">Filter Not Equal</div>
+          <div class="function-purpose">
+            Exclude rows where a column matches a specific value
+          </div>
+          <div class="function-example">
+            SELECT * FROM Customers WHERE State <> 'NY';
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>🎯 Filter Using Operators!</h3>
+          <div class="example-input">
+            <label>Column:</label>
+            <select id="operatorColumn">
+              <option value="quantity">Quantity</option>
+              <option value="price">Price</option>
+            </select>
+            <label>Operator:</label>
+            <select id="operatorType">
+              <option value=">">Greater Than</option>
+              <option value="<">Less Than</option>
+              <option value="=">Equal To</option>
+              <option value="<>">Not Equal To</option>
+            </select>
+            <label>Value:</label>
+            <input type="number" id="operatorValue" value="5" step="1" />
+            <button onclick="applyOperatorFilter()">Filter Data</button>
+          </div>
+          <div class="example-result" id="operatorFilterResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+              </tr>
+              <tr>
+                <td>John Smith</td>
+                <td>10</td>
+                <td>$25.00</td>
+              </tr>
+              <tr>
+                <td>Jane Doe</td>
+                <td>3</td>
+                <td>$15.00</td>
+              </tr>
+              <tr>
+                <td>Bob Johnson</td>
+                <td>7</td>
+                <td>$30.00</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIKE Patterns Tab -->
+      <div id="like" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🔍 Pattern Matching with LIKE
+        </h2>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)"
+        >
+          <div class="function-name">Wildcard Search</div>
+          <div class="function-purpose">
+            Find rows with partial matches using % (zero or more characters)
+          </div>
+          <div class="function-example">
+            SELECT * FROM Products WHERE ProductName LIKE '%Book%';
+          </div>
+        </div>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%)"
+        >
+          <div class="function-name">Single Character Search</div>
+          <div class="function-purpose">
+            Find rows that match a pattern with _ (single character)
+          </div>
+          <div class="function-example">
+            SELECT * FROM Customers WHERE FirstName LIKE 'J_';
+          </div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>🎯 Search with Patterns!</h3>
+          <div class="example-input">
+            <label>Pattern:</label>
+            <input
+              type="text"
+              id="likePattern"
+              value="%Smith%"
+              placeholder="Enter pattern (use % and _)"
+            />
+            <button onclick="applyLikeFilter()">Search</button>
+          </div>
+          <div class="example-result" id="likeFilterResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+              </tr>
+              <tr>
+                <td>John Smith</td>
+                <td>5</td>
+                <td>$25.00</td>
+              </tr>
+              <tr>
+                <td>James Smithson</td>
+                <td>2</td>
+                <td>$40.00</td>
+              </tr>
+              <tr>
+                <td>Sarah Smithfield</td>
+                <td>8</td>
+                <td>$18.00</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Limit Rows Tab -->
+      <div id="limit" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          🎯 Limiting Results
+        </h2>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
+        >
+          <div class="function-name">TOP in SQL Server</div>
+          <div class="function-purpose">Limit results to the first N rows</div>
+          <div class="function-example">
+            SELECT TOP 5 * FROM Products ORDER BY Price DESC;
+          </div>
+        </div>
+
+        <div
+          class="function-card"
+          style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"
+        >
+          <div class="function-name">LIMIT in MySQL</div>
+          <div class="function-purpose">Limit results to the first N rows</div>
+          <div class="function-example">SELECT * FROM Products LIMIT 5;</div>
+        </div>
+
+        <div class="interactive-example">
+          <h3>🎯 Limit Your Results!</h3>
+          <div class="example-input">
+            <label>Limit:</label>
+            <input type="number" id="limitValue" value="3" min="1" max="10" />
+            <button onclick="applyLimit()">Apply Limit</button>
+          </div>
+          <div class="example-result" id="limitResult">
+            <table style="width: 100%; border-collapse: collapse">
+              <tr style="background: #e0e0e0">
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+              </tr>
+              <tr>
+                <td>John Smith</td>
+                <td>5</td>
+                <td>$25.00</td>
+              </tr>
+              <tr>
+                <td>Jane Doe</td>
+                <td>10</td>
+                <td>$15.00</td>
+              </tr>
+              <tr>
+                <td>Bob Johnson</td>
+                <td>3</td>
+                <td>$30.00</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Tab -->
+      <div id="summary" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          📋 Summary of Selection Criteria
+        </h2>
+        <table class="summary-table">
+          <tr>
+            <th>Concept</th>
+            <th>Purpose</th>
+            <th>Example</th>
+          </tr>
+          <tr>
+            <td>`WHERE`</td>
+            <td>Filters rows based on conditions</td>
+            <td>`WHERE State = 'CA'`</td>
+          </tr>
+          <tr>
+            <td>Relational Operators</td>
+            <td>Filter using comparisons</td>
+            <td>`>=`, `<`, `<>`</td>
+          </tr>
+          <tr>
+            <td>`LIKE`</td>
+            <td>Matches patterns in strings</td>
+            <td>`LIKE '%LOVE%'`</td>
+          </tr>
+          <tr>
+            <td>`TOP`, `LIMIT`</td>
+            <td>Limits number of rows shown</td>
+            <td>`TOP 5`, `LIMIT 10`</td>
+          </tr>
+          <tr>
+            <td>Wildcards</td>
+            <td>Flexible text search</td>
+            <td>`%`, `_`, `[ ]`, `[^ ]`</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        // Hide all tab contents
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => (content.style.display = "none"));
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show selected tab content
+        document.getElementById(tabName).style.display = "block";
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+
+      function applyBasicFilter() {
+        const column = document.getElementById("filterColumn").value;
+        const value = document.getElementById("filterValue").value;
+        const result = document.getElementById("basicFilterResult");
+
+        // Simulate filtering based on column and value
+        let filteredData = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+            `;
+
+        if (column === "name") {
+          filteredData += `
+                    <tr>
+                        <td>${value}</td>
+                        <td>5</td>
+                        <td>$25.00</td>
+                    </tr>
+                `;
+        } else if (column === "quantity") {
+          filteredData += `
+                    <tr>
+                        <td>John Smith</td>
+                        <td>${value}</td>
+                        <td>$25.00</td>
+                    </tr>
+                `;
+        } else if (column === "price") {
+          filteredData += `
+                    <tr>
+                        <td>John Smith</td>
+                        <td>5</td>
+                        <td>$${value}.00</td>
+                    </tr>
+                `;
+        }
+
+        filteredData += `</table>`;
+        result.innerHTML = filteredData;
+      }
+
+      function applyOperatorFilter() {
+        const column = document.getElementById("operatorColumn").value;
+        const operator = document.getElementById("operatorType").value;
+        const value = document.getElementById("operatorValue").value;
+        const result = document.getElementById("operatorFilterResult");
+
+        // Simulate operator-based filtering
+        let filteredData = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+            `;
+
+        if (column === "quantity") {
+          filteredData += `
+                    <tr>
+                        <td>John Smith</td>
+                        <td>${value > 5 ? 10 : 3}</td>
+                        <td>$25.00</td>
+                    </tr>
+                `;
+        } else if (column === "price") {
+          filteredData += `
+                    <tr>
+                        <td>John Smith</td>
+                        <td>5</td>
+                        <td>$${value > 20 ? 30 : 15}.00</td>
+                    </tr>
+                `;
+        }
+
+        filteredData += `</table>`;
+        result.innerHTML = filteredData;
+      }
+
+      function applyLikeFilter() {
+        const pattern = document.getElementById("likePattern").value;
+        const result = document.getElementById("likeFilterResult");
+
+        // Simulate pattern matching
+        let matches = [
+          { name: "John Smith", quantity: 5, price: 25 },
+          { name: "Sarah Smithfield", quantity: 8, price: 18 },
+          { name: "James Smithson", quantity: 2, price: 40 },
+        ].filter((item) =>
+          item.name
+            .toLowerCase()
+            .includes(pattern.toLowerCase().replace("%", "").replace("_", ""))
+        );
+
+        let tableData = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+            `;
+
+        matches.forEach((match) => {
+          tableData += `
+                    <tr>
+                        <td>${match.name}</td>
+                        <td>${match.quantity}</td>
+                        <td>$${match.price}.00</td>
+                    </tr>
+                `;
+        });
+
+        tableData += `</table>`;
+        result.innerHTML = tableData;
+      }
+
+      function applyLimit() {
+        const limit = document.getElementById("limitValue").value;
+        const result = document.getElementById("limitResult");
+
+        // Simulate result limiting
+        let limitedData = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+            `;
+
+        for (let i = 1; i <= limit; i++) {
+          limitedData += `
+                    <tr>
+                        <td>Person ${i}</td>
+                        <td>${i * 2}</td>
+                        <td>$${i * 10}.00</td>
+                    </tr>
+                `;
+        }
+
+        limitedData += `</table>`;
+        result.innerHTML = limitedData;
+      }
+
+      // Initialize interactive examples
+      applyBasicFilter();
+      applyOperatorFilter();
+      applyLikeFilter();
+      applyLimit();
+    </script>
+  </body>
+</html>

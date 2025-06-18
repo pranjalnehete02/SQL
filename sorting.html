@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Sorting Visual Guide</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: white;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .function-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: rgb(4, 4, 4);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .function-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .function-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .function-purpose {
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .function-example {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .hierarchy-diagram {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 30px;
+        margin: 20px 0;
+      }
+
+      .hierarchy-title {
+        text-align: center;
+        font-size: 1.8em;
+        margin-bottom: 30px;
+        color: #2c3e50;
+      }
+
+      .function-tree {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .tree-level {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .tree-node {
+        background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+        padding: 15px 25px;
+        border-radius: 10px;
+        color: #2c3e50;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+
+      .tree-node.root {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 1.2em;
+      }
+
+      .interactive-example {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+
+      .example-input {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .example-input input,
+      .example-input select {
+        padding: 8px 12px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .example-result {
+        background: #d4edda;
+        border: 2px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: "Courier New", monospace;
+        font-weight: bold;
+      }
+
+      button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: transform 0.2s ease;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .tips {
+        background: #e3f2fd;
+        border-left: 5px solid #2196f3;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 0 10px 10px 0;
+      }
+
+      .tips h3 {
+        color: #1976d2;
+        margin-bottom: 10px;
+      }
+
+      .summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .summary-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .summary-table tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+</html>
+
+</head>
+<body>
+    <div class="container">
+        <h1>🔖 SQL Sorting Visual Guide</h1>
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('overview')">📊 Overview</div>
+            <div class="tab" onclick="showTab('single')">🔤 Single Column Sorting</div>
+            <div class="tab" onclick="showTab('multi')">🧱 Multiple Column Sorting</div>
+            <div class="tab" onclick="showTab('calculated')">🧮 Calculated Fields</div>
+            <div class="tab" onclick="showTab('special')">💡 Special Sorting Cases</div>
+        </div>
+    
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="hierarchy-diagram">
+                <h2 class="hierarchy-title">SQL Sorting Hierarchy</h2>
+                <div class="function-tree">
+                    <div class="tree-level">
+                        <div class="tree-node root">SQL Sorting</div>
+                    </div>
+                    <div class="tree-level">
+                        <div class="tree-node">Single Column</div>
+                        <div class="tree-node">Multiple Columns</div>
+                    </div>
+                    <div class="tree-level">
+                        <div class="tree-node">Calculated Fields</div>
+                        <div class="tree-node">Special Cases</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tips">
+                <h3>💡 Key Concepts</h3>
+                <p>Sorting in SQL is achieved using the <strong>ORDER BY</strong> clause, which:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Always comes <strong>last</strong> in a SELECT statement</li>
+                    <li>Sorts by column names, positions, or expressions</li>
+                    <li>Can be <strong>ascending</strong> (default) or <strong>descending</strong></li>
+                    <li>Can handle multiple columns and calculated fields</li>
+                </ul>
+            </div>
+        </div>
+    
+        <!-- Single Column Sorting Tab -->
+        <div id="single" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">🔤 Single Column Sorting</h2>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                <div class="function-name">Ascending Order (A-Z or 1-100)</div>
+                <div class="function-purpose">Sorts data in alphabetical or numerical order</div>
+                <div class="function-example">SELECT * FROM Employees ORDER BY LastName;</div>
+            </div>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                <div class="function-name">Descending Order (Z-A or 100-1)</div>
+                <div class="function-purpose">Sorts data in reverse order</div>
+                <div class="function-example">SELECT * FROM Orders ORDER BY OrderDate DESC;</div>
+            </div>
+            
+            <div class="interactive-example">
+                <h3>🎯 Try It Yourself!</h3>
+                <div class="example-input">
+                    <label>Sort Column:</label>
+                    <select id="sortColumn">
+                        <option value="name">Name</option>
+                        <option value="age">Age</option>
+                        <option value="salary">Salary</option>
+                    </select>
+                    <label>Order:</label>
+                    <select id="sortOrder">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                    <button onclick="sortData()">Sort Data</button>
+                </div>
+                <div class="example-result" id="sortResult">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="background: #e0e0e0;">
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Salary</th>
+                        </tr>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>28</td>
+                            <td>$60,000</td>
+                        </tr>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>32</td>
+                            <td>$75,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob Johnson</td>
+                            <td>24</td>
+                            <td>$55,000</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Multiple Column Sorting Tab -->
+        <div id="multi" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">🧱 Multiple Column Sorting</h2>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                <div class="function-name">Primary and Secondary Sorting</div>
+                <div class="function-purpose">Sorts by one column first, then another for ties</div>
+                <div class="function-example">SELECT * FROM Employees ORDER BY LastName, FirstName;</div>
+            </div>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);">
+                <div class="function-name">Mixed Sorting Directions</div>
+                <div class="function-purpose">Sorts different columns in different directions</div>
+                <div class="function-example">SELECT * FROM Products ORDER BY Category ASC, Price DESC;</div>
+            </div>
+            
+            <div class="interactive-example">
+                <h3>🎯 Sort with Multiple Columns!</h3>
+                <div class="example-input">
+                    <label>Primary Column:</label>
+                    <select id="primaryColumn">
+                        <option value="name">Name</option>
+                        <option value="age">Age</option>
+                        <option value="salary">Salary</option>
+                    </select>
+                    <label>Order:</label>
+                    <select id="primaryOrder">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                    <br>
+                    <label>Secondary Column:</label>
+                    <select id="secondaryColumn">
+                        <option value="age">Age</option>
+                        <option value="salary">Salary</option>
+                    </select>
+                    <label>Order:</label>
+                    <select id="secondaryOrder">
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                    <button onclick="multiSortData()">Sort Data</button>
+                </div>
+                <div class="example-result" id="multiSortResult">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="background: #e0e0e0;">
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Salary</th>
+                        </tr>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>28</td>
+                            <td>$60,000</td>
+                        </tr>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>32</td>
+                            <td>$75,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob Johnson</td>
+                            <td>24</td>
+                            <td>$55,000</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Calculated Fields Tab -->
+        <div id="calculated" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">🧮 Sorting by Calculated Fields</h2>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);">
+                <div class="function-name">Using Column Aliases</div>
+                <div class="function-purpose">Sorts by an expression with a meaningful name</div>
+                <div class="function-example">SELECT LastName + ', ' + FirstName AS FullName FROM Employees ORDER BY FullName;</div>
+            </div>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);">
+                <div class="function-name">Direct Expressions</div>
+                <div class="function-purpose">Sorts by an expression without an alias</div>
+                <div class="function-example">SELECT * FROM Products ORDER BY Price * Quantity;</div>
+            </div>
+            
+            <div class="interactive-example">
+                <h3>🎯 Sort Using Calculations!</h3>
+                <div class="example-input">
+                    <label>Formula:</label>
+                    <select id="calculationType">
+                        <option value="fullname">Full Name (Last, First)</option>
+                        <option value="salarybonus">Salary + Bonus</option>
+                    </select>
+                    <button onclick="calculateSort()">Sort Data</button>
+                </div>
+                <div class="example-result" id="calculationResult">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="background: #e0e0e0;">
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Salary + Bonus</th>
+                        </tr>
+                        <tr>
+                            <td>John Doe</td>
+                            <td>28</td>
+                            <td>$70,000</td>
+                        </tr>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>32</td>
+                            <td>$85,000</td>
+                        </tr>
+                        <tr>
+                            <td>Bob Johnson</td>
+                            <td>24</td>
+                            <td>$60,000</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Special Sorting Cases Tab -->
+        <div id="special" class="tab-content">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">💡 Special Sorting Cases</h2>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #fdbb2d 0%, #22c1c3 100%);">
+                <div class="function-name">Handling NULL Values</div>
+                <div class="function-purpose">Controls placement of NULL values in sorting</div>
+                <div class="function-example">SELECT * FROM Employees ORDER BY Salary NULLS LAST;</div>
+            </div>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <div class="function-name">Sorting Mixed Data Types</div>
+                <div class="function-purpose">Handles numeric and character data together</div>
+                <div class="function-example">SELECT * FROM MixedData ORDER BY Value;</div>
+            </div>
+            
+            <div class="function-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <div class="function-name">Custom Sort Order</div>
+                <div class="function-purpose">Applies custom sorting logic using CASE</div>
+                <div class="function-example">SELECT * FROM Products ORDER BY CASE Status WHEN 'High' THEN 1 WHEN 'Medium' THEN 2 ELSE 3 END;</div>
+            </div>
+            
+            <div class="tips">
+                <h3>💡 Important Tips</h3>
+                <p><strong>NULLs:</strong> In most SQL dialects, NULLs appear first in ascending order and last in descending order.</p>
+                <br>
+                <p><strong>Data Types:</strong> Mixing numeric and character data can lead to unexpected results if not handled properly.</p>
+                <br>
+                <p><strong>Performance:</strong> Sorting on indexed columns is generally faster, but complex expressions may require additional resources.</p>
+            </div>
+        </div>
+        
+        <!-- Summary Table -->
+        <div class="tab-content" id="summary" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">📋 Summary of Sorting Techniques</h2>
+            <table class="summary-table">
+                <tr>
+                    <th>Sorting Technique</th>
+                    <th>Example</th>
+                    <th>Use Case</th>
+                </tr>
+                <tr>
+                    <td>Single Column Sorting</td>
+                    <td>ORDER BY LastName</td>
+                    <td>Alphabetical listings (A-Z) or numerical order</td>
+                </tr>
+                <tr>
+                    <td>Descending Order</td>
+                    <td>ORDER BY OrderDate DESC</td>
+                    <td>Display newest records first</td>
+                </tr>
+                <tr>
+                    <td>Multiple Columns</td>
+                    <td>ORDER BY LastName, FirstName</td>
+                    <td>Disambiguate records with same primary values</td>
+                </tr>
+                <tr>
+                    <td>Calculated Fields</td>
+                    <td>ORDER BY Salary + Bonus</td>
+                    <td>Sort based on computed values</td>
+                </tr>
+                <tr>
+                    <td>Handling NULLs</td>
+                    <td>ORDER BY ISNULL(Salary, 0)</td>
+                    <td>Control placement of NULL values in results</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.style.display = 'none');
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).style.display = 'block';
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    
+        function sortData() {
+            const column = document.getElementById('sortColumn').value;
+            const order = document.getElementById('sortOrder').value;
+            const result = document.getElementById('sortResult');
+            
+            // Simulate data sorting (in a real application this would interact with real data)
+            result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Salary</th>
+                    </tr>
+                    <tr>
+                        <td>John Doe</td>
+                        <td>${order === 'asc' ? '24' : '32'}</td>
+                        <td>${order === 'asc' ? '$55,000' : '$75,000'}</td>
+                    </tr>
+                    <tr>
+                        <td>${order === 'asc' ? 'Bob Johnson' : 'Jane Smith'}</td>
+                        <td>${order === 'asc' ? '28' : '24'}</td>
+                        <td>${order === 'asc' ? '$60,000' : '$60,000'}</td>
+                    </tr>
+                    <tr>
+                        <td>${order === 'asc' ? 'Jane Smith' : 'Bob Johnson'}</td>
+                        <td>${order === 'asc' ? '32' : '28'}</td>
+                        <td>${order === 'asc' ? '$75,000' : '$55,000'}</td>
+                    </tr>
+                </table>
+            `;
+        }
+    
+        function multiSortData() {
+            const primaryColumn = document.getElementById('primaryColumn').value;
+            const primaryOrder = document.getElementById('primaryOrder').value;
+            const secondaryColumn = document.getElementById('secondaryColumn').value;
+            const secondaryOrder = document.getElementById('secondaryOrder').value;
+            const result = document.getElementById('multiSortResult');
+            
+            // Simulate multiple column sorting
+            result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Salary</th>
+                    </tr>
+                    <tr>
+                        <td>${
+                            primaryColumn === 'name' && primaryOrder === 'asc' ? 
+                            'Bob Johnson' : 
+                            primaryColumn === 'name' && primaryOrder === 'desc' ? 
+                            'Jane Smith' : 
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            'Bob Johnson' : 
+                            'Jane Smith'
+                        }</td>
+                        <td>${
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            '24' : 
+                            '32'
+                        }</td>
+                        <td>${
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            '$55,000' : 
+                            '$75,000'
+                        }</td>
+                    </tr>
+                    <tr>
+                        <td>${
+                            primaryColumn === 'name' && primaryOrder === 'asc' ? 
+                            'John Doe' : 
+                            primaryColumn === 'name' && primaryOrder === 'desc' ? 
+                            'Bob Johnson' : 
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            'John Doe' : 
+                            'Bob Johnson'
+                        }</td>
+                        <td>${
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            '28' : 
+                            '28'
+                        }</td>
+                        <td>${
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            '$60,000' : 
+                            '$60,000'
+                        }</td>
+                    </tr>
+                    <tr>
+                        <td>${
+                            primaryColumn === 'name' && primaryOrder === 'asc' ? 
+                            'Jane Smith' : 
+                            primaryColumn === 'name' && primaryOrder === 'desc' ? 
+                            'John Doe' : 
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            'Jane Smith' : 
+                            'John Doe'
+                        }</td>
+                        <td>${
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            '32' : 
+                            '32'
+                        }</td>
+                        <td>${
+                            primaryColumn === 'salary' && primaryOrder === 'asc' ? 
+                            '$75,000' : 
+                            '$75,000'
+                        }</td>
+                    </tr>
+                </table>
+            `;
+        }
+    
+        function calculateSort() {
+            const calculationType = document.getElementById('calculationType').value;
+            const result = document.getElementById('calculationResult');
+            
+            // Simulate calculated sort
+            result.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #e0e0e0;">
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>${
+                            calculationType === 'fullname' ? 
+                            'Full Name' : 
+                            'Salary + Bonus'
+                        }</th>
+                    </tr>
+                    <tr>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            'Bob Johnson' : 
+                            'John Doe'
+                        }</td>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            '24' : 
+                            '28'
+                        }</td>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            'Johnson, Bob' : 
+                            '$70,000'
+                        }</td>
+                    </tr>
+                    <tr>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            'John Doe' : 
+                            'Jane Smith'
+                        }</td>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            '28' : 
+                            '32'
+                        }</td>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            'Doe, John' : 
+                            '$85,000'
+                        }</td>
+                    </tr>
+                    <tr>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            'Jane Smith' : 
+                            'Bob Johnson'
+                        }</td>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            '32' : 
+                            '24'
+                        }</td>
+                        <td>${
+                            calculationType === 'fullname' ? 
+                            'Smith, Jane' : 
+                            '$60,000'
+                        }</td>
+                    </tr>
+                </table>
+            `;
+        }
+    
+        // Initialize interactive examples
+        sortData();
+        multiSortData();
+        calculateSort();
+    </script>
+    </body>
+    </html>
