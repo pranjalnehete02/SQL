@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SQL Learning Hub</title>
+    <style>
+      /* Base resets and typography */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        min-height: 100vh;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Navbar */
+      .navbar {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: white;
+        text-decoration: none;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 1rem;
+      }
+
+      .nav-menu li a {
+        text-decoration: none;
+        color: white;
+        padding: 0.5rem;
+        transition: color 0.2s;
+      }
+
+      .nav-menu li a:hover {
+        color: #0073e6;
+      }
+
+      /* Hero */
+      .hero {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .hero-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+      }
+
+      /* Topics Grid */
+      .topics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+
+      .topic-btn {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: white;
+        text-decoration: none;
+        display: block;
+        transition: transform 0.3s ease;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .topic-btn:hover {
+        transform: translateY(-5px);
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 5px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+      }
+
+      .tab {
+        flex: 1;
+        padding: 15px;
+        text-align: center;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: black;
+        font-weight: 600;
+      }
+
+      .tab.active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content {
+        display: none;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Query Card */
+      .query-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: black;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        margin-bottom: 15px;
+      }
+
+      .query-card:hover {
+        transform: translateY(-5px);
+      }
+
+      .query-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .query-purpose {
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .query-example {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      /* Database Table */
+      .db-table-container {
+        background: black;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .db-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+
+      .db-table th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px;
+        text-align: left;
+      }
+
+      .db-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .db-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .db-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+      }
+
+      .db-table tr:hover {
+        background-color: #e8f4ff;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .nav-menu {
+          flex-direction: column;
+        }
+
+        .tabs {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SQL Learning Hub</h1>
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('home')">🏠 Home</div>
+        <div class="tab" onclick="showTab('functions')">Functions</div>
+        <div class="tab" onclick="showTab('sorting')">Sorting</div>
+        <div class="tab" onclick="showTab('selection')">Selection Criteria</div>
+        <div class="tab" onclick="showTab('boolean')">Boolean Logic</div>
+        <div class="tab" onclick="showTab('conditional')">
+          Conditional Logic
+        </div>
+        <div class="tab" onclick="showTab('summarizing')">Summarizing Data</div>
+        <div class="tab" onclick="showTab('subqueries')">Subqueries</div>
+        <div class="tab" onclick="showTab('setlogic')">Set Logic</div>
+      </div>
+
+      <div id="home" class="tab-content active">
+        <div class="hero-card">
+          <h2>Welcome to SQL Learning Hub</h2>
+          <p>
+            Master SQL concepts from basic to advanced. Explore interactive
+            guides on functions, selection criteria, sorting techniques, and
+            more.
+          </p>
+        </div>
+
+        <div class="topics-grid">
+          <a href="#functions" class="topic-btn" onclick="showTab('functions')"
+            >Functions</a
+          >
+          <a href="#sorting" class="topic-btn" onclick="showTab('sorting')"
+            >Sorting</a
+          >
+          <a href="#selection" class="topic-btn" onclick="showTab('selection')"
+            >Selection</a
+          >
+          <a href="#boolean" class="topic-btn" onclick="showTab('boolean')"
+            >BOOLEANS</a
+          >
+          <a
+            href="#conditional"
+            class="topic-btn"
+            onclick="showTab('conditional')"
+            >CONDITIONALS</a
+          >
+          <a
+            href="#summarizing"
+            class="topic-btn"
+            onclick="showTab('summarizing')"
+            >Summarization</a
+          >
+          <a
+            href="#subqueries"
+            class="topic-btn"
+            onclick="showTab('subqueries')"
+            >SubQueries</a
+          >
+          <a href="#setlogic" class="topic-btn" onclick="showTab('setlogic')"
+            >Set Logic</a
+          >
+        </div>
+
+        <br />
+        <br />
+        <h1>ffdfdfdf</h1>
+      </div>
+
+      <div class="container">
+        <h1>SQL Database Tables</h1>
+
+        <div class="tabs">
+          <div class="tab active" onclick="showTab('overview')">
+            🏠 Overview
+          </div>
+          <div class="tab" onclick="showTab('products')">Products</div>
+          <div class="tab" onclick="showTab('sales')">Sales</div>
+          <div class="tab" onclick="showTab('customers')">Customers</div>
+          <div class="tab" onclick="showTab('employees')">Employees</div>
+          <div class="tab" onclick="showTab('orders')">Orders</div>
+          <div class="tab" onclick="showTab('orderdetails')">Order Details</div>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+            Database Schema Overview
+          </h2>
+
+          <div class="table-container">
+            <h3 class="table-title">Overview of All Tables</h3>
+            <table class="db-table">
+              <tr>
+                <th>Table Name</th>
+                <th>Purpose</th>
+                <th>Key Columns</th>
+              </tr>
+              <tr>
+                <td>Products</td>
+                <td>Stores product information</td>
+                <td>ProductID, ProductName, Price</td>
+              </tr>
+              <tr>
+                <td>Sales</td>
+                <td>Records sales transactions</td>
+                <td>SaleID, ProductID, CustomerID, TotalAmount</td>
+              </tr>
+              <tr>
+                <td>Customers</td>
+                <td>Stores customer information</td>
+                <td>CustomerID, FirstName, LastName, LoyaltyPoints</td>
+              </tr>
+              <tr>
+                <td>Employees</td>
+                <td>Stores employee information</td>
+                <td>EmployeeID, FirstName, LastName, Salary</td>
+              </tr>
+              <tr>
+                <td>Orders</td>
+                <td>Tracks customer orders</td>
+                <td>OrderID, CustomerID, TotalAmount, Status</td>
+              </tr>
+              <tr>
+                <td>OrderDetails</td>
+                <td>Provides details of each order</td>
+                <td>OrderDetailID, OrderID, ProductID, Quantity</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Products Table -->
+        <div id="products" class="tab-content">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+            Products Table
+          </h2>
+
+          <div class="table-container">
+            <table class="db-table">
+              <tr>
+                <th>ProductID</th>
+                <th>ProductName</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>StockQuantity</th>
+                <th>LastUpdated</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Laptop</td>
+                <td>Electronics</td>
+                <td>999.99</td>
+                <td>10</td>
+                <td>2023-10-05</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Smartphone</td>
+                <td>Electronics</td>
+                <td>699.99</td>
+                <td>15</td>
+                <td>2023-10-06</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Coffee Maker</td>
+                <td>Appliances</td>
+                <td>49.99</td>
+                <td>20</td>
+                <td>2023-10-07</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Blender</td>
+                <td>Appliances</td>
+                <td>29.99</td>
+                <td>5</td>
+                <td>2023-10-08</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Toaster</td>
+                <td>Appliances</td>
+                <td>19.99</td>
+                <td>30</td>
+                <td>2023-10-09</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sales Table -->
+        <div id="sales" class="tab-content">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+            Sales Table
+          </h2>
+
+          <div class="table-container">
+            <table class="db-table">
+              <tr>
+                <th>SaleID</th>
+                <th>ProductID</th>
+                <th>CustomerID</th>
+                <th>SaleDate</th>
+                <th>Quantity</th>
+                <th>TotalAmount</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>1</td>
+                <td>101</td>
+                <td>2023-10-01</td>
+                <td>2</td>
+                <td>1999.98</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>2</td>
+                <td>102</td>
+                <td>2023-10-02</td>
+                <td>1</td>
+                <td>699.99</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>3</td>
+                <td>101</td>
+                <td>2023-10-03</td>
+                <td>3</td>
+                <td>149.97</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>4</td>
+                <td>103</td>
+                <td>2023-10-04</td>
+                <td>1</td>
+                <td>29.99</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>5</td>
+                <td>102</td>
+                <td>2023-10-05</td>
+                <td>2</td>
+                <td>39.98</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Customers Table -->
+        <div id="customers" class="tab-content">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+            Customers Table
+          </h2>
+
+          <div class="table-container">
+            <table class="db-table">
+              <tr>
+                <th>CustomerID</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>RegistrationDate</th>
+                <th>LoyaltyPoints</th>
+              </tr>
+              <tr>
+                <td>101</td>
+                <td>John</td>
+                <td>Doe</td>
+                <td>john.doe@example.com</td>
+                <td>2022-01-15</td>
+                <td>500</td>
+              </tr>
+              <tr>
+                <td>102</td>
+                <td>Jane</td>
+                <td>Smith</td>
+                <td>jane.smith@example.com</td>
+                <td>2022-02-20</td>
+                <td>800</td>
+              </tr>
+              <tr>
+                <td>103</td>
+                <td>Bob</td>
+                <td>Johnson</td>
+                <td>bob.johnson@example.com</td>
+                <td>2022-03-10</td>
+                <td>300</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Employees Table -->
+        <div id="employees" class="tab-content">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+            Employees Table
+          </h2>
+
+          <div class="table-container">
+            <table class="db-table">
+              <tr>
+                <th>EmployeeID</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>JobTitle</th>
+                <th>HireDate</th>
+                <th>Salary</th>
+                <th>Department</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>Alice</td>
+                <td>Brown</td>
+                <td>Manager</td>
+                <td>2020-05-01</td>
+                <td>75000.00</td>
+                <td>Sales</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Mike</td>
+                <td>Davis</td>
+                <td>Developer</td>
+                <td>2021-03-15</td>
+                <td>85000.00</td>
+                <td>IT</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Sarah</td>
+                <td>Wilson</td>
+                <td>Analyst</td>
+                <td>2022-01-10</td>
+                <td>65000.00</td>
+                <td>Finance</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div id="orders" class="tab-content">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+            Orders Table
+          </h2>
+
+          <div class="table-container">
+            <table class="db-table">
+              <tr>
+                <th>OrderID</th>
+                <th>CustomerID</th>
+                <th>OrderDate</th>
+                <th>TotalAmount</th>
+                <th>Status</th>
+              </tr>
+              <tr>
+                <td>1001</td>
+                <td>101</td>
+                <td>2023-09-01</td>
+                <td>1999.98</td>
+                <td>Shipped</td>
+              </tr>
+              <tr>
+                <td>1002</td>
+                <td>102</td>
+                <td>2023-09-02</td>
+                <td>699.99</td>
+                <td>Shipped</td>
+              </tr>
+              <tr>
+                <td>1003</td>
+                <td>101</td>
+                <td>2023-09-03</td>
+                <td>149.97</td>
+                <td>Processing</td>
+              </tr>
+              <tr>
+                <td>1004</td>
+                <td>103</td>
+                <td>2023-09-10</td>
+                <td>29.99</td>
+                <td>Shipped</td>
+              </tr>
+              <tr>
+                <td>1005</td>
+                <td>102</td>
+                <td>2023-09-15</td>
+                <td>39.98</td>
+                <td>Cancelled</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Order Details Table -->
+        <div id="orderdetails" class="tab-content">
+          <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+            Order Details Table
+          </h2>
+
+          <div class="table-container">
+            <table class="db-table">
+              <tr>
+                <th>OrderDetailID</th>
+                <th>OrderID</th>
+                <th>ProductID</th>
+                <th>Quantity</th>
+                <th>UnitPrice</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>1001</td>
+                <td>1</td>
+                <td>2</td>
+                <td>999.99</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>1002</td>
+                <td>2</td>
+                <td>1</td>
+                <td>699.99</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>1003</td>
+                <td>3</td>
+                <td>3</td>
+                <td>49.99</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>1004</td>
+                <td>4</td>
+                <td>1</td>
+                <td>29.99</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>1005</td>
+                <td>5</td>
+                <td>2</td>
+                <td>19.99</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="functions" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Functions
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Definition of a Function</div>
+          <div class="query-purpose">
+            A function is a predefined rule that takes input values and returns
+            a result.
+          </div>
+          <div class="query-example">
+            <b>LEFT function</b><br />
+            SELECT LEFT('sunlight',3) AS ShortString; <br /><i>Returns "sun"</i
+            ><br />
+            <br />
+
+            <b>RIGHT function</b><br />
+            SELECT RIGHT('sunlight',5) AS ShortString; <br /><i
+              >Returns "light"</i
+            ><br />
+            <br />
+
+            <b>STARSUBSTRING function</b><br />
+            SELECT SUBSTRING('thewhitegoat',4,5) AS Result; <br /><i
+              >Returns "white"</i
+            ><br />
+            <br />
+
+            <b>LTRIM function</b><br />
+            SELECT LTRIM(' apple') AS TrimmedString; <br /><i>Returns "apple"</i
+            ><br />
+            <br />
+
+            <b>RTRIM function</b><br />
+            SELECT RTRIM('hello ') AS TrimmedString; <br /><i>Returns "hello"</i
+            ><br />
+            <br />
+
+            <b>UPPER function</b><br />
+            SELECT UPPER('Abraham') AS Result; <br /><i>Returns "ABRAHAM"</i
+            ><br />
+            <br />
+
+            <b>LOWER function</b><br />
+            SELECT LOWER('LINCOLN') AS Result; <br /><i>Returns "lincoln"</i
+            ><br />
+            <br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Scalar vs. Aggregate Functions</div>
+          <div class="query-purpose">
+            Scalar functions operate on a single row, while aggregate functions
+            operate on multiple rows.
+          </div>
+          <div class="query-example">
+            <b>Scalar function example</b><br />
+            SELECT ProductID, LEFT(ProductName, 3) AS ShortName FROM Products;
+            <br /><i>-- Returns the first 3 characters of ProductName</i><br />
+            <br />
+
+            <b>Aggregate function example</b><br />
+            SELECT Category, COUNT(*) AS ProductCount FROM Products GROUP BY
+            Category; <br /><i
+              >-- Returns the count of products in each category</i
+            ><br />
+            <br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Character (String) Functions</div>
+          <div class="query-purpose">
+            Functions that manipulate string data.
+          </div>
+          <div class="query-example">
+            SELECT ProductID, UPPER(ProductName) <br />AS ProductNameUpper FROM
+            Products;
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Date & Time Functions</div>
+          <div class="query-purpose">
+            Functions that manipulate date and time data.
+          </div>
+          <div class="query-example">
+            <b>GETDATE() function</b><br />
+            SELECT GETDATE(); <br /><i>Returns current date and time</i><br />
+            <br />
+
+            <b>DATEPART function</b><br />
+            SELECT DATEPART(month, '2025-06-18') AS MonthPart; <br /><i
+              >Returns 6</i
+            ><br />
+            <br />
+
+            <b>DATEDIFF function</b><br />
+            SELECT DATEDIFF(day, '2025-06-01', '2025-06-18') AS DayDifference;
+            <br /><i>Returns 17</i><br />
+            <br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Numeric (Mathematical) Functions</div>
+          <div class="query-purpose">
+            Functions that perform mathematical operations.
+          </div>
+          <div class="query-example">
+            <b>ROUND function</b><br />
+            SELECT ROUND(712.863, 2) AS RoundedValue; <br /><i
+              >-- Returns 712.86</i
+            ><br />
+            <br />
+
+            <b>PI function</b><br />
+            SELECT PI() AS PiValue; <br /><i
+              >-- Returns approximately 3.14159265358979</i
+            ><br />
+            <br />
+
+            <b>POWER function</b><br />
+            SELECT POWER(5, 2) AS PowerResult; <br /><i>-- Returns 25</i><br />
+            SELECT POWER(25, 0.5) AS SquareRoot; <br /><i>-- Returns 5</i><br />
+            <br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Conversion Functions</div>
+          <div class="query-purpose">
+            Functions that convert data from one type to another.
+          </div>
+          <div class="query-example">
+            SELECT ProductID, ProductName,<br />
+            CAST(Price AS INT) AS IntegerPrice<br />
+            FROM Products;
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">NULL-handling Functions</div>
+          <div class="query-purpose">
+            Functions that handle NULL values in data.
+          </div>
+          <div class="query-example">
+            SELECT ProductID, ProductName,<br />
+            ISNULL(StockQuantity, 0) AS StockQuantity<br />
+            FROM Products;
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Composite Functions</div>
+          <div class="query-purpose">
+            Functions that combine multiple functions.
+          </div>
+          <div class="query-example">
+            SELECT ProductID,<br />
+            UPPER(LTRIM(RTRIM(ProductName))) AS CleanProductName<br />
+            FROM Products;
+          </div>
+        </div>
+      </div>
+
+      <div id="sorting" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Chapter 5: Sorting Data
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Importance of Sorting</div>
+          <div class="query-purpose">
+            Sorting helps organize data for better readability and analysis.
+          </div>
+          <div class="query-example">
+            <b>SELECT</b> ProductID, ProductName, Price <br />
+            <b>FROM</b> Products <br />
+            <b>ORDER BY</b> Price ASC; <br />
+            <i>-- Returns products sorted by price in ascending order</i><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            5 | Toaster | 19.99<br />
+            4 | Blender | 29.99<br />
+            3 | Coffee Maker | 49.99<br />
+            2 | Smartphone | 699.99<br />
+            1 | Laptop | 999.99<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">SQL's ORDER BY Clause</div>
+          <div class="query-purpose">
+            Sorts query results based on specified columns.
+          </div>
+          <div class="query-example">
+            SELECT ProductID, ProductName, Price <br />FROM Products ORDER BY
+            Price ASC;
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Types of Sorting</div>
+          <div class="query-purpose">
+            Different methods to sort data in SQL.
+          </div>
+          <div class="query-example">
+            <b>Ascending order</b><br />
+            SELECT CustomerID, FirstName, LastName,<br />
+            LoyaltyPoints<br />
+            FROM Customers<br />
+            ORDER BY LoyaltyPoints ASC;<br />
+            <i>-- Orders results by LoyaltyPoints in ascending order</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            103 | Bob | Johnson | 300<br />
+            101 | John | Doe | 500<br />
+            102 | Jane | Smith | 800<br /><br /><br />
+
+            <b>Descending order</b><br />
+            SELECT SaleID, ProductID, TotalAmount<br />
+            FROM Sales<br />
+            ORDER BY TotalAmount DESC;<br />
+            <i>-- Orders results by TotalAmount in descending order</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | 1 | 1999.98<br />
+            2 | 2 | 699.99<br />
+            3 | 3 | 149.97<br />
+            5 | 5 | 39.98<br />
+            4 | 4 | 29.99<br />
+            <br /><br />
+
+            <b>Sorting by multiple columns</b><br />
+            SELECT OrderID, CustomerID, OrderDate, Status<br />
+            FROM Orders<br />
+            ORDER BY Status, OrderDate;<br />
+            <i>-- Orders results by Status and then by OrderDate</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1005 | 102 | 2023-09-15 | Cancelled<br />
+            1003 | 101 | 2023-09-03 | Processing<br />
+            1001 | 101 | 2023-09-01 | Shipped<br />
+            1002 | 102 | 2023-09-02 | Shipped<br />
+            1004 | 103 | 2023-09-10 | Shipped<br />
+            <br /><br />
+
+            <b>Sorting by calculated fields</b><br />
+            SELECT ProductID, ProductName, LEN(ProductName) AS NameLength<br />
+            FROM Products<br />
+            ORDER BY NameLength;<br />
+            <i>-- Orders results by the length of ProductName</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            5 | Toaster | 7<br />
+            4 | Blender | 7<br />
+            3 | Coffee Maker | 12<br />
+            2 | Smartphone | 11<br />
+            1 | Laptop | 6<br />
+            <br /><br />
+
+            <b>Sorting and data type behavior</b><br />
+            SELECT ProductID, ProductName, Category, Price<br />
+            FROM Products<br />
+            ORDER BY Category, Price;<br />
+            <i>-- Orders results by Category and then by Price</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            3 | Coffee Maker | Appliances | 49.99<br />
+            4 | Blender | Appliances | 29.99<br />
+            5 | Toaster | Appliances | 19.99<br />
+            1 | Laptop | Electronics | 999.99<br />
+            2 | Smartphone | Electronics | 699.99<br />
+            <br /><br />
+
+            <b>NULL values in sorting</b><br />
+            SELECT EmployeeID, FirstName, LastName, Salary<br />
+            FROM Employees<br />
+            ORDER BY Salary;<br />
+            <i
+              >-- Orders results by Salary, with NULL values typically appearing
+              last</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            3 | Sarah | Wilson | 65000<br />
+            1 | Alice | Brown | 75000<br />
+            2 | Mike | Davis | 85000<br />
+            <br /><br />
+          </div>
+        </div>
+      </div>
+
+      <div id="selection" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Chapter 6: Selection Criteria
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Basic Selection with WHERE</div>
+          <div class="query-purpose">Filter rows based on conditions.</div>
+          <div class="query-example">
+            SELECT ProductID, ProductName, Price<br />
+            FROM Products<br />
+            WHERE Price > 100;<br />
+            <i>-- Returns products with a price greater than 100</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | Laptop | 999.99<br />
+            2 | Smartphone | 699.99<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Basic WHERE Operators</div>
+          <div class="query-purpose">Use operators to specify conditions.</div>
+          <div class="query-example">
+            SELECT CustomerID, FirstName, LastName, RegistrationDate<br />
+            FROM Customers<br />
+            WHERE RegistrationDate > '2022-01-01';<br />
+            <i>-- Returns customers who registered after January 1, 2022</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe | 2022-01-15<br />
+            102 | Jane | Smith | 2022-02-20<br />
+            103 | Bob | Johnson | 2022-03-10<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Pattern Matching with LIKE</div>
+          <div class="query-purpose">Search for patterns in string data.</div>
+          <div class="query-example">
+            SELECT ProductID, ProductName<br />
+            FROM Products<br />
+            WHERE ProductName LIKE 'L%';<br />
+            <i>-- Returns products whose names start with the letter 'L'</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | Laptop<br />
+            2 | Smartphone<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Limiting Rows</div>
+          <div class="query-purpose">Restrict the number of rows returned.</div>
+          <div class="query-example">
+            -- SQL Server<br />
+            SELECT TOP 3 CustomerID, FirstName, LastName, LoyaltyPoints<br />
+            FROM Customers<br />
+            ORDER BY LoyaltyPoints DESC;<br />
+            <i>-- Returns the top 3 customers with the highest LoyaltyPoints</i
+            ><br />
+            <br /><br />
+
+            -- MySQL<br />
+            SELECT CustomerID, FirstName, LastName, LoyaltyPoints<br />
+            FROM Customers<br />
+            ORDER BY LoyaltyPoints DESC<br />
+            LIMIT 3;<br />
+            <i>-- Returns the top 3 customers with the highest LoyaltyPoints</i
+            ><br />
+            <br /><br />
+
+            -- Oracle<br />
+            SELECT CustomerID, FirstName, LastName, LoyaltyPoints<br />
+            FROM Customers<br />
+            WHERE ROWNUM <= 3<br />
+            ORDER BY LoyaltyPoints DESC;<br />
+            <i>-- Returns the top 3 customers with the highest LoyaltyPoints</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            102 | Jane | Smith | 800<br />
+            101 | John | Doe | 500<br />
+            103 | Bob | Johnson | 300<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Advanced Logical Selection</div>
+          <div class="query-purpose">
+            Combine multiple conditions for complex filtering.
+          </div>
+          <div class="query-example">
+            SELECT SaleID, ProductID, Quantity, TotalAmount<br />
+            FROM Sales<br />
+            WHERE Quantity BETWEEN 1 AND 5<br />
+            AND TotalAmount > 100;<br />
+            <i
+              >-- Returns sales with Quantity between 1 and 5 and TotalAmount
+              greater than 100</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | 1 | 2 | 1999.98<br />
+            2 | 2 | 1 | 699.99<br />
+            3 | 3 | 3 | 149.97<br />
+          </div>
+        </div>
+      </div>
+
+      <div id="boolean" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Chapter 7: Boolean Logic
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Basic Boolean Operators</div>
+          <div class="query-purpose">
+            Combine conditions using AND, OR, and NOT.
+          </div>
+          <div class="query-example">
+            <b>AND operator</b><br />
+            SELECT CustomerID, FirstName, LastName, LoyaltyPoints,
+            RegistrationDate<br />
+            FROM Customers<br />
+            WHERE RegistrationDate > '2022-01-01'<br />
+            AND LoyaltyPoints > 400;<br />
+            <i
+              >-- Returns customers who registered after January 1, 2022 and
+              have more than 400 LoyaltyPoints</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe | 500 | 2022-01-15<br />
+            102 | Jane | Smith | 800 | 2022-02-20<br />
+
+            <br /><br />
+
+            <b>OR operator</b><br />
+            SELECT CustomerID, FirstName, LastName, LoyaltyPoints,
+            RegistrationDate<br />
+            FROM Customers<br />
+            WHERE LoyaltyPoints > 700<br />
+            OR RegistrationDate < '2022-01-01';<br />
+            <i
+              >-- Returns customers who have more than 700 LoyaltyPoints or
+              registered before January 1, 2022</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            102 | Jane | Smith | 800 | 2022-02-20<br />
+            <br /><br />
+
+            <b>NOT operator</b><br />
+            SELECT CustomerID, FirstName, LastName<br />
+            FROM Customers<br />
+            WHERE CustomerID NOT IN (SELECT CustomerID FROM Sales);<br />
+            <i>-- Returns customers who have not made any sales</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            103 | Bob | Johnson<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Parentheses for Operator Precedence</div>
+          <div class="query-purpose">
+            Control the order of operations in complex conditions.
+          </div>
+          <div class="query-example">
+            SELECT CustomerID, FirstName, LastName<br />
+            FROM Customers<br />
+            WHERE CustomerID IN (<br />
+            SELECT CustomerID<br />
+            FROM Sales<br />
+            WHERE (ProductID = 1 OR ProductID = 2)<br />
+            AND TotalAmount > 500<br />
+            );<br />
+            <i
+              >-- Returns customers who have made sales of ProductID 1 or 2 with
+              a TotalAmount greater than 500</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Special Boolean Tools</div>
+          <div class="query-purpose">
+            Use BETWEEN, IN, and handle NULL values.
+          </div>
+          <div class="query-example">
+            <b>BETWEEN operator</b><br />
+            SELECT OrderID, CustomerID, OrderDate<br />
+            FROM Orders<br />
+            WHERE OrderDate BETWEEN '2023-09-01' AND '2023-09-15';<br />
+            <i
+              >-- Returns orders placed between September 1, 2023 and September
+              15, 2023</i
+            ><br />
+            <i><b>Result:</b></i
+            ><br />
+            1001 | 101 | 2023-09-01<br />
+            1002 | 102 | 2023-09-02<br />
+            1003 | 101 | 2023-09-03<br />
+            1004 | 103 | 2023-09-10<br />
+            1005 | 102 | 2023-09-15<br />
+            <br /><br />
+
+            <b>IN operator</b><br />
+            SELECT ProductID, ProductName, Category<br />
+            FROM Products<br />
+            WHERE Category IN ('Electronics', 'Appliances');<br />
+            <i
+              >-- Returns products in the Electronics or Appliances
+              categories</i
+            ><br />
+            <i><b>Result:</b></i
+            ><br />
+            1 | Laptop | Electronics<br />
+            2 | Smartphone | Electronics<br />
+            3 | Coffee Maker | Appliances<br />
+            4 | Blender | Appliances<br />
+            5 | Toaster | Appliances<br />
+            <br /><br />
+
+            <b>Handling NULL values</b><br />
+            SELECT EmployeeID, FirstName, LastName, Salary, Department<br />
+            FROM Employees<br />
+            WHERE Salary IS NOT NULL<br />
+            AND Department = 'Sales';<br />
+            <i
+              >-- Returns employees in the Sales department with a non-null
+              salary</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | Alice | Brown | 75000 | Sales<br />
+          </div>
+        </div>
+      </div>
+
+      <div id="conditional" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Chapter 8: Conditional Logic
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Introduction to CASE Expression</div>
+          <div class="query-purpose">
+            Create conditional logic within SQL queries.
+          </div>
+          <div class="query-example">
+            SELECT CustomerID, FirstName, LastName, LoyaltyPoints,<br />
+            CASE WHEN LoyaltyPoints > 800 THEN 'Gold' <br />
+            WHEN LoyaltyPoints > 500 THEN 'Silver' <br />
+            ELSE 'Bronze' <br />
+            END AS Tier <br />
+            FROM Customers;<br />
+            <i
+              >-- Returns customers with their LoyaltyPoints and assigned
+              tier</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe | 500 | Silver<br />
+            102 | Jane | Smith | 800 | Gold<br />
+            103 | Bob | Johnson | 300 | Bronze<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Simple CASE</div>
+          <div class="query-purpose">Map specific values to results.</div>
+          <div class="query-example">
+            SELECT OrderID, CustomerID, Status,<br />
+            CASE Status<br />
+            WHEN 'Shipped' THEN 'Delivered'<br />
+            WHEN 'Processing' THEN 'In Progress'<br />
+            ELSE Status<br />
+            END AS StatusDescription<br />
+            FROM Orders;<br />
+            <i
+              >-- Returns orders with their status and a description of the
+              status</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1001 | 101 | Shipped | Delivered<br />
+            1002 | 102 | Shipped | Delivered<br />
+            1003 | 101 | Processing | In Progress<br />
+            1004 | 103 | Shipped | Delivered<br />
+            1005 | 102 | Cancelled | Cancelled<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Searched CASE</div>
+          <div class="query-purpose">
+            Evaluate conditions to determine results.
+          </div>
+          <div class="query-example">
+            SELECT SaleID, ProductID, TotalAmount,<br />
+            CASE<br />
+            WHEN TotalAmount > 1000 THEN TotalAmount * 0.1<br />
+            WHEN TotalAmount > 500 THEN TotalAmount * 0.05<br />
+            ELSE 0<br />
+            END AS Discount<br />
+            FROM Sales;<br />
+            <i
+              >-- Returns sales with their TotalAmount and calculated
+              discount</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | 1 | 1999.98 | 199.998<br />
+            2 | 2 | 699.99 | 34.9995<br />
+            3 | 3 | 149.97 | 0<br />
+            4 | 4 | 29.99 | 0<br />
+            5 | 5 | 39.98 | 0<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Using CASE in Various Clauses</div>
+          <div class="query-purpose">
+            Use CASE in SELECT, ORDER BY, WHERE, and HAVING clauses.
+          </div>
+          <div class="query-example">
+            <b>SELECT Clause</b><br />
+            SELECT ProductID, ProductName, Price,<br />
+            CASE<br />
+            WHEN Price > 500 THEN 'High'<br />
+            WHEN Price > 100 THEN 'Medium'<br />
+            ELSE 'Low'<br />
+            END AS PriceCategory<br />
+            FROM Products;<br />
+            <i>-- Returns products with their PriceCategory based on Price</i
+            ><br />
+            <i><b>Result:</b></i
+            ><br />
+            1 | Laptop | 999.99 | High<br />
+            2 | Smartphone | 699.99 | High<br />
+            3 | Coffee Maker | 49.99 | Low<br />
+            4 | Blender | 29.99 | Low<br />
+            5 | Toaster | 19.99 | Low<br />
+            <br /><br />
+
+            <b>ORDER BY Clause</b><br />
+            SELECT CustomerID, FirstName, LastName, LoyaltyPoints,<br />
+            CASE<br />
+            WHEN LoyaltyPoints > 800 THEN 'Gold'<br />
+            WHEN LoyaltyPoints > 500 THEN 'Silver'<br />
+            ELSE 'Bronze'<br />
+            END AS Tier<br />
+            FROM Customers<br />
+            ORDER BY Tier;<br />
+            <i
+              >-- Returns customers ordered by their tier based on
+              LoyaltyPoints</i
+            ><br />
+            <i><b>Result:</b></i
+            ><br />
+            103 | Bob | Johnson | 300 | Bronze<br />
+            101 | John | Doe | 500 | Silver<br />
+            102 | Jane | Smith | 800 | Gold<br />
+            <br /><br />
+
+            <b>WHERE Clause</b><br />
+            SELECT CustomerID, FirstName, LastName, LoyaltyPoints<br />
+            FROM Customers<br />
+            WHERE CASE<br />
+            WHEN LoyaltyPoints > 800 THEN 'Gold'<br />
+            WHEN LoyaltyPoints > 500 THEN 'Silver'<br />
+            ELSE 'Bronze'<br />
+            END = 'Gold';<br />
+            <i>-- Returns customers with 'Gold' tier based on LoyaltyPoints</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            102 | Jane | Smith | 800<br />
+            <br />
+            <br />
+
+            <b>HAVING Clause</b><br />
+            SELECT CustomerID, FirstName, LastName, SUM(TotalAmount) AS
+            TotalSpent<br />
+            FROM Customers<br />
+            JOIN Sales ON Customers.CustomerID = Sales.CustomerID<br />
+            GROUP BY CustomerID, FirstName, LastName<br />
+            HAVING SUM(TotalAmount) > CASE<br />
+            WHEN AVG(TotalAmount) > 500 THEN 1000<br />
+            ELSE 500<br />
+            END;<br />
+            <i
+              >-- Returns customers who have spent more than a threshold based
+              on average TotalAmount</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe | 1999.98<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Defensive Programming with CASE</div>
+          <div class="query-purpose">Avoid errors by handling edge cases.</div>
+          <div class="query-example">
+            SELECT ProductID, ProductName,<br />
+            CASE<br />
+            WHEN StockQuantity = 0 THEN 0<br />
+            ELSE Price / StockQuantity<br />
+            END AS PricePerUnit<br />
+            FROM Products;<br />
+            <i
+              >-- Returns products with their PricePerUnit, handling cases where
+              StockQuantity is 0</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | Laptop | 99.999<br />
+            2 | Smartphone | 46.666<br />
+            3 | Coffee Maker | 2.4995<br />
+            4 | Blender | 5.998<br />
+            5 | Toaster | 0.6663333333333333<br />
+          </div>
+        </div>
+      </div>
+
+      <div id="summarizing" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Chapter 9: Summarizing Data
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Aggregate Functions</div>
+          <div class="query-purpose">
+            Perform calculations on sets of values.
+          </div>
+          <div class="query-example">
+            <b>SUM()</b><br />
+            SELECT SUM(TotalAmount) AS TotalSales<br />
+            FROM Sales;<br />
+            <i>-- Returns the total sales amount</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            TotalSales | 2929.91<br />
+            <br /><br />
+
+            <b>AVG()</b><br />
+            SELECT AVG(Price) AS AveragePrice<br />
+            FROM Products;<br />
+            <i>-- Returns the average price of products</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            AveragePrice | 379.978<br />
+            <br /><br />
+
+            <b>MIN()</b><br />
+            SELECT MIN(StockQuantity) AS MinStock<br />
+            FROM Products;<br />
+            <i>-- Returns the minimum stock quantity of products</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            MinStock | 5<br />
+            <br /><br />
+
+            <b>MAX()</b><br />
+            SELECT MAX(StockQuantity) AS MaxStock<br />
+            FROM Products;<br />
+            <i>-- Returns the maximum stock quantity of products</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            MaxStock | 30<br />
+            <br /><br />
+
+            <b>COUNT()</b><br />
+            SELECT COUNT(*) AS CustomerCount<br />
+            FROM Customers;<br />
+            <i>-- Returns the total number of customers</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            CustomerCount | 3<br />
+            <br /><br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">GROUP BY Clause</div>
+          <div class="query-purpose">
+            Group rows that have the same values in specified columns.
+          </div>
+          <div class="query-example">
+            <b>GROUP BY Clause</b><br />
+            SELECT CustomerID, SUM(TotalAmount) AS TotalSpent<br />
+            FROM Sales<br />
+            GROUP BY CustomerID;<br />
+            <i>-- Returns the total amount spent by each customer</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            101 | 2149.95<br />
+            102 | 739.97<br />
+            103 | 29.99<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">HAVING Clause</div>
+          <div class="query-purpose">
+            Filter grouped results based on conditions.
+          </div>
+          <div class="query-example">
+            <b>GROUP BY with HAVING Clause</b><br />
+            SELECT CustomerID, SUM(TotalAmount) AS TotalSpent<br />
+            FROM Sales<br />
+            GROUP BY CustomerID<br />
+            HAVING SUM(TotalAmount) > 500;<br />
+            <i>-- Returns customers who have spent more than 500</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            101 | 2149.95<br />
+            102 | 739.97<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Conditional Logic in Aggregation</div>
+          <div class="query-purpose">
+            Use CASE statements within aggregate functions.
+          </div>
+          <div class="query-example">
+            <b>Conditional Aggregation</b><br />
+            SELECT SUM(CASE WHEN Status = 'Shipped' THEN 1 ELSE 0 END) AS
+            ShippedOrders,<br />
+            SUM(CASE WHEN Status = 'Processing' THEN 1 ELSE 0 END) AS
+            ProcessingOrders<br />
+            FROM Orders;<br />
+            <i>-- Returns the count of shipped and processing orders</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            ShippedOrders | 3<br />
+            ProcessingOrders | 1<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Common Mistakes in Summarization</div>
+          <div class="query-purpose">
+            Avoid common errors when using GROUP BY and aggregate functions.
+          </div>
+          <div class="query-example">
+            SELECT CustomerID, FirstName, SUM(TotalAmount) AS TotalSpent<br />
+            FROM Customers<br />
+            JOIN Sales ON Customers.CustomerID = Sales.CustomerID<br />
+            GROUP BY CustomerID, FirstName;<br />
+            <i
+              >-- Returns the total amount spent by each customer, including
+              their FirstName</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | 2149.95<br />
+            102 | Jane | 739.97<br />
+            103 | Bob | 29.99<br />
+          </div>
+        </div>
+      </div>
+
+      <div id="subqueries" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Chapter 14: Subqueries
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Definition and Purpose of Subqueries</div>
+          <div class="query-purpose">
+            Subqueries are nested SELECT statements used to filter, calculate,
+            or combine data.
+          </div>
+          <div class="query-example">
+            SELECT CustomerID, FirstName, LastName<br />
+            FROM Customers<br />
+            WHERE CustomerID IN (<br />
+            SELECT CustomerID<br />
+            FROM Sales<br />
+            WHERE ProductID = 1<br />
+            );<br />
+            <i>-- Returns customers who have made a purchase of ProductID 1</i
+            ><br />
+            <br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Using Subqueries in Different Clauses</div>
+          <div class="query-purpose">
+            Use subqueries in WHERE, FROM, and SELECT clauses.
+          </div>
+          <div class="query-example">
+            <b>WHERE Clause</b><br />
+            SELECT CustomerID, FirstName, LastName<br />
+            FROM Customers<br />
+            WHERE CustomerID IN (<br />
+            SELECT CustomerID<br />
+            FROM Sales<br />
+            WHERE ProductID = 1<br />
+            );<br />
+            <i>-- Returns customers who have made a purchase of ProductID 1</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe<br /><br />
+            <br /><br />
+            <b>FROM Clause</b><br />
+            SELECT AVG(TotalSpent) AS AverageSpent<br />
+            FROM (<br />
+            SELECT CustomerID, SUM(TotalAmount) AS TotalSpent<br />
+            FROM Sales<br />
+            GROUP BY CustomerID<br />
+            ) AS CustomerTotals;<br />
+            <i>-- Returns the average amount spent by customers</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            AverageSpent | 973.3033333333334<br /><br />
+            <br /><br />
+            <b>SELECT Clause</b><br />
+            SELECT CustomerID, FirstName, LastName,<br />
+            (SELECT COUNT(*)<br />
+            FROM Sales<br />
+            WHERE Customers.CustomerID = Sales.CustomerID) AS OrderCount<br />
+            FROM Customers;<br />
+            <i>-- Returns customers with the count of their orders</i><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe | 2<br />
+            102 | Jane | Smith | 1<br />
+            103 | Bob | Johnson | 1<br /><br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Correlated vs. Uncorrelated Subqueries</div>
+          <div class="query-purpose">
+            Correlated subqueries depend on outer query values, while
+            uncorrelated ones do not.
+          </div>
+          <div class="query-example">
+            <b>Correlated Subquery</b><br />
+            SELECT CustomerID, FirstName, LastName<br />
+            FROM Customers<br />
+            WHERE (<br />
+            SELECT SUM(TotalAmount)<br />
+            FROM Sales<br />
+            WHERE Customers.CustomerID = Sales.CustomerID<br />
+            ) > (<br />
+            SELECT AVG(TotalSpent)<br />
+            FROM (<br />
+            SELECT CustomerID, SUM(TotalAmount) AS TotalSpent<br />
+            FROM Sales<br />
+            GROUP BY CustomerID<br />
+            ) AS AvgTotal<br />
+            );<br />
+            <i
+              >-- Returns customers whose total spent is greater than the
+              average total spent by all customers</i
+            ><br />
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe<br />
+            <br />
+            <br />
+
+            <b>Uncorrelated Subquery</b><br />
+            SELECT ProductID, ProductName, Price<br />
+            FROM Products<br />
+            WHERE Price > (<br />
+            SELECT AVG(Price)<br />
+            FROM Products<br />
+            );<br />
+            <i
+              >-- Returns products whose price is greater than the average price
+              of all products</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1 | Laptop | 999.99<br />
+            2 | Smartphone | 699.99<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">EXISTS vs. IN</div>
+          <div class="query-purpose">
+            Check for existence of rows with EXISTS or compare values with IN.
+          </div>
+          <div class="query-example">
+            <b>EXISTS</b><br />
+            SELECT CustomerID, FirstName, LastName<br />
+            FROM Customers<br />
+            WHERE EXISTS (<br />
+            SELECT 1<br />
+            FROM Sales<br />
+            WHERE Customers.CustomerID = Sales.CustomerID<br />
+            );<br />
+            <i>-- Returns customers who have made at least one sale</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe<br />
+            102 | Jane | Smith<br />
+            103 | Bob | Johnson<br />
+            <br /><br />
+
+            <b>IN</b><br />
+            SELECT CustomerID, FirstName, LastName<br />
+            FROM Customers<br />
+            WHERE CustomerID IN (<br />
+            SELECT CustomerID<br />
+            FROM Sales<br />
+            );<br />
+            <i>-- Returns customers who have made at least one sale</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe<br />
+            102 | Jane | Smith<br />
+            103 | Bob | Johnson<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Common Table Expressions (CTEs)</div>
+          <div class="query-purpose">
+            Create temporary result sets for complex queries.
+          </div>
+          <div class="query-example">
+            <b>WITH CustomerTotals AS</b><br />
+            (<br />
+            SELECT CustomerID, SUM(TotalAmount) AS TotalSpent<br />
+            FROM Sales<br />
+            GROUP BY CustomerID<br />
+            )<br />
+            <b>SELECT</b> c.CustomerID, c.FirstName, c.LastName,
+            ct.TotalSpent<br />
+            <b>FROM</b> Customers c<br />
+            <b>JOIN</b> CustomerTotals ct <b>ON</b> c.CustomerID =
+            ct.CustomerID<br />
+            <b>WHERE</b> ct.TotalSpent > 500;<br />
+            <i>-- Returns customers who have spent more than 500</i><br />
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe | 2149.95<br />
+            102 | Jane | Smith | 739.97<br />
+          </div>
+        </div>
+      </div>
+
+      <div id="setlogic" class="tab-content">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50">
+          Chapter 15: Set Logic
+        </h2>
+
+        <div class="query-card">
+          <div class="query-name">Definition of Set Logic</div>
+          <div class="query-purpose">
+            Combine multiple query results into a single result set.
+          </div>
+          <div class="query-example">
+            <b>SELECT</b> OrderID, CustomerID, Status<br />
+            <b>FROM</b> Orders<br />
+            <b>WHERE</b> Status = 'Shipped'<br />
+            <b>UNION</b><br />
+            <b>SELECT</b> OrderID, CustomerID, Status<br />
+            <b>FROM</b> Orders<br />
+            <b>WHERE</b> Status = 'Cancelled';<br />
+            <i>-- Returns orders that are either 'Shipped' or 'Cancelled'</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1001 | 101 | Shipped<br />
+            1002 | 102 | Shipped<br />
+            1004 | 103 | Shipped<br />
+            1005 | 102 | Cancelled<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Set Operators</div>
+          <div class="query-purpose">
+            Use UNION, UNION ALL, INTERSECT, and EXCEPT to combine results.
+          </div>
+          <div class="query-example">
+            <b>UNION ALL</b><br />
+            SELECT OrderID, CustomerID, Status<br />
+            FROM Orders<br />
+            WHERE Status = 'Shipped'<br />
+            <b>UNION ALL</b><br />
+            SELECT OrderID, CustomerID, Status<br />
+            FROM Orders<br />
+            WHERE Status = 'Cancelled';<br />
+            <i
+              >-- Returns all orders that are either 'Shipped' or 'Cancelled',
+              including duplicates</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1001 | 101 | Shipped<br />
+            1002 | 102 | Shipped<br />
+            1004 | 103 | Shipped<br />
+            1005 | 102 | Cancelled<br />
+            <br /><br />
+
+            <b>INTERSECT</b><br />
+            SELECT CustomerID<br />
+            FROM Orders<br />
+            INTERSECT<br />
+            SELECT CustomerID<br />
+            FROM Sales;<br />
+            <i
+              >-- Returns CustomerIDs that are present in both Orders and Sales
+              tables</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101<br />
+            102<br />
+            103<br />
+            <br /><br />
+
+            <b>EXCEPT</b><br />
+            SELECT CustomerID<br />
+            FROM Orders<br />
+            EXCEPT<br />
+            SELECT CustomerID<br />
+            FROM Sales;<br />
+            <i>-- Returns CustomerIDs that are in Orders but not in Sales</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            -- (No rows returned, assuming all CustomerIDs in Orders are also in
+            Sales)<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">Syntax Rules for Set Operators</div>
+          <div class="query-purpose">
+            Ensure columns match in number, order, and data type.
+          </div>
+          <div class="query-example">
+            <b>UNION</b><br />
+            SELECT OrderID, CustomerID, Status<br />
+            FROM Orders<br />
+            WHERE Status = 'Shipped'<br />
+            UNION<br />
+            SELECT OrderID, CustomerID, Status<br />
+            FROM Orders<br />
+            WHERE Status = 'Cancelled';<br />
+            <i
+              >-- Returns orders that are either 'Shipped' or 'Cancelled',
+              without duplicates</i
+            ><br />
+            <br /><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1001 | 101 | Shipped<br />
+            1002 | 102 | Shipped<br />
+            1004 | 103 | Shipped<br />
+            1005 | 102 | Cancelled<br />
+          </div>
+        </div>
+
+        <div class="query-card">
+          <div class="query-name">When to Use Set Logic vs. Joins</div>
+          <div class="query-purpose">
+            Choose between set logic and joins based on your data needs.
+          </div>
+          <div class="query-example">
+            <b>Set logic example</b><br />
+            SELECT OrderID, CustomerID, Status<br />
+            FROM Orders<br />
+            WHERE Status = 'Shipped'<br />
+            <b>UNION</b><br />
+            SELECT OrderID, CustomerID, Status<br />
+            FROM Orders<br />
+            WHERE Status = 'Cancelled';<br />
+            <i
+              >-- Returns orders that are either 'Shipped' or 'Cancelled',
+              without duplicates</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            1001 | 101 | Shipped<br />
+            1002 | 102 | Shipped<br />
+            1004 | 103 | Shipped<br />
+            1005 | 102 | Cancelled<br />
+            <br /><br />
+
+            <b>Join example</b><br />
+            SELECT c.CustomerID, c.FirstName, c.LastName, s.OrderID,
+            s.TotalAmount<br />
+            FROM Customers c<br />
+            JOIN Sales s ON c.CustomerID = s.CustomerID;<br />
+            <i>-- Returns customer details along with their sales information</i
+            ><br />
+
+            <i><b>Result:</b></i
+            ><br />
+            101 | John | Doe | 1 | 1999.98<br />
+            102 | Jane | Smith | 2 | 699.99<br />
+            101 | John | Doe | 3 | 149.97<br />
+            103 | Bob | Johnson | 4 | 29.99<br />
+            102 | Jane | Smith | 5 | 39.98<br />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function showTab(tabName) {
+        // Hide all tab contents
+        const contents = document.querySelectorAll(".tab-content");
+        contents.forEach((content) => (content.style.display = "none"));
+
+        // Remove active class from all tabs
+        const tabs = document.querySelectorAll(".tab");
+        tabs.forEach((tab) => tab.classList.remove("active"));
+
+        // Show selected tab content
+        document.getElementById(tabName).style.display = "block";
+
+        // Add active class to clicked tab
+        event.target.classList.add("active");
+      }
+    </script>
+  </body>
+</html>
